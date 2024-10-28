@@ -1,13 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const { sequelize } = require('./models');
-const userRoutes = require('./routes/userRoutes.js');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 // Routes
-app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
 
 // Sync database and start the server
 sequelize.authenticate().then(() => {
