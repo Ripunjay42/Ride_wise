@@ -10,12 +10,19 @@
   },
   "dependencies": {
     "@firebase/auth": "^1.8.0",
+    "@googlemaps/js-api-loader": "^1.16.8",
+    "@react-google-maps/api": "^2.20.3",
+    "@react-leaflet/core": "^2.1.0",
     "axios": "^1.7.7",
     "firebase": "^11.0.1",
+    "leaflet": "^1.9.4",
+    "leaflet-routing-machine": "^3.2.12",
+    "lucide": "^0.454.0",
     "lucide-react": "^0.453.0",
     "next": "14.0.4",
-    "react": "^18",
+    "react": "^18.3.1",
     "react-dom": "^18",
+    "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
