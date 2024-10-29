@@ -1,14 +1,16 @@
 'use client';
-import React, { useState } from 'react';
-import { auth, provider } from '@/components/firebase/firebaseconfig'; // Adjust import path if necessary
+import React, { useState, useEffect } from 'react';
+import { auth, provider } from '@/components/firebase/firebaseconfig';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import axios from 'axios';
-import TopBar from '@/components/Topbar'; // Adjust import path as needed
-import Dashboard from '@/components/Dashboard'; // Import the Dashboard component
+import TopBar from '@/components/Topbar';
+import { useRouter } from 'next/navigation';
 
 const AuthFlow = () => {
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [userType, setUserType] = useState('passenger'); // Default user type
+  const router = useRouter();
+  const [googleSignInComplete, setGoogleSignInComplete] = useState(false);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [userType, setUserType] = useState('passenger');
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -18,7 +20,19 @@ const AuthFlow = () => {
     vehicleNumber: '',
     vehicleType: '',
   });
-  const [isDashboard, setIsDashboard] = useState(false); // New state to render the dashboard
+
+  // Cleanup function to sign out if user leaves after Google sign-in but before registration
+  useEffect(() => {
+    return () => {
+      if (auth.currentUser && googleSignInComplete && !registrationComplete) {
+        signOut(auth).then(() => {
+          console.log('User signed out due to incomplete registration');
+        }).catch((error) => {
+          console.error('Error signing out:', error);
+        });
+      }
+    };
+  }, [googleSignInComplete, registrationComplete]);
 
   // Handle Google login
   const handleGoogleSignIn = async () => {
@@ -29,23 +43,51 @@ const AuthFlow = () => {
       // Check if the user already exists in the backend
       const response = await axios.get(`http://localhost:3001/api/auth/user/${user.email}`);
 
-      // If user exists, go directly to the dashboard
+      // If user exists, route based on user type
       if (response.data.exists) {
         console.log('User exists:', response.data);
-        setIsDashboard(true);
-        setIsRegistered(false);
+        setRegistrationComplete(true);
+        if (response.data.userType === 'driver') {
+          router.push('/dashboard');
+        } else {
+          router.push('/');
+        }
       } else {
-        // User does not exist, set form data
+        // User does not exist, set form data and mark Google sign-in as complete
         setFormData({
           ...formData,
           email: user.email,
-          firstName: user.displayName.split(' ')[0], // Assuming name format "First Last"
-          lastName: user.displayName.split(' ')[1], // Assuming name format "First Last"
+          firstName: user.displayName?.split(' ')[0] || '',
+          lastName: user.displayName?.split(' ')[1] || '',
         });
-        setIsRegistered(true);
+        setGoogleSignInComplete(true);
       }
     } catch (error) {
       console.error('Error during Google Sign-In:', error);
+      // If there's an error, make sure to sign out
+      await signOut(auth);
+      setGoogleSignInComplete(false);
+    }
+  };
+
+  // Handle manual sign out
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setGoogleSignInComplete(false);
+      setRegistrationComplete(false);
+      setFormData({
+        email: '',
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
+        licenseNumber: '',
+        vehicleNumber: '',
+        vehicleType: '',
+      });
+      console.log('User signed out successfully');
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
   };
 
@@ -56,14 +98,21 @@ const AuthFlow = () => {
     try {
       const response = await axios.post(`http://localhost:3001/api/auth/signup`, {
         ...formData,
-        userType, // Send user type to the backend
+        userType,
       });
       console.log('User registered:', response.data);
+      setRegistrationComplete(true);
 
-      // Navigate to Dashboard after successful registration
-      setIsDashboard(true);
+      // Route based on user type after successful registration
+      if (userType === 'driver') {
+        router.push('/dashboard');
+      } else {
+        router.push('/');
+      }
     } catch (error) {
       console.error('Error registering user:', error);
+      // If registration fails, sign out the user
+      await handleSignOut();
     }
   };
 
@@ -73,46 +122,16 @@ const AuthFlow = () => {
     setFormData({ ...formData, [id]: value });
   };
 
-  // Logout function
-  const handleLogout = async () => {
-    try {
-      await signOut(auth); // Sign out from Firebase
-      setIsDashboard(false); // Reset to show AuthFlow
-      setIsRegistered(false); // Reset registration state
-      setFormData({ // Clear form data
-        email: '',
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
-        licenseNumber: '',
-        vehicleNumber: '',
-        vehicleType: '',
-      });
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
-  };
-
-  // Render the Dashboard if the user is logged in and registered
-  if (isDashboard) {
-    return (
-      <div>
-        <TopBar />
-        <Dashboard onLogout={handleLogout} /> {/* Pass logout function to Dashboard */}
-      </div>
-    );
-  }
-
   return (
     <div>
       <TopBar />
       <div className="min-h-screen bg-gray-100 py-12 px-4 mt-16">
         <div className="max-w-md mx-auto bg-white rounded shadow-md p-6">
           <h2 className="text-2xl font-bold text-center mb-4">
-            {!isRegistered ? 'Welcome to RideWise' : 'Complete Your Profile'}
+            {!googleSignInComplete ? 'Welcome to RideWise' : 'Complete Your Profile'}
           </h2>
 
-          {!isRegistered ? (
+          {!googleSignInComplete ? (
             <div className="space-y-4">
               <button 
                 onClick={handleGoogleSignIn}
@@ -158,7 +177,7 @@ const AuthFlow = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="border border-gray-300 p-2 rounded w-full"
-                  disabled // Disable email field since it comes from Google
+                  disabled
                 />
               </div>
 
@@ -196,7 +215,6 @@ const AuthFlow = () => {
                 />
               </div>
 
-              {/* Additional fields for Drivers */}
               {userType === 'driver' && (
                 <>
                   <div>
@@ -232,9 +250,18 @@ const AuthFlow = () => {
                 </>
               )}
 
-              <button type="submit" className="w-full bg-green-500 text-white rounded px-4 py-2 hover:bg-green-400">
-                Complete Registration
-              </button>
+              <div className="flex gap-4">
+                <button type="submit" className="flex-1 bg-green-500 text-white rounded px-4 py-2 hover:bg-green-400">
+                  Complete Registration
+                </button>
+                <button 
+                  type="button" 
+                  onClick={handleSignOut}
+                  className="flex-1 bg-gray-500 text-white rounded px-4 py-2 hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           )}
         </div>

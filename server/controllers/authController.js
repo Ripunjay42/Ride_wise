@@ -40,26 +40,22 @@ const signup = async (req, res) => {
 
 
 const checkUserExistence = async (req, res) => {
-  const { email } = req.params; // Get the email from request parameters
-  console.log('Checking existence for email:', email); // Log the email
-
+  const { email } = req.params;
+  console.log('Checking existence for email:', email);
+  
   try {
     // Check in Driver collection
     const driverCount = await Driver.count({ where: { email } });
-    console.log('Driver count:', driverCount); // Log count
-
     if (driverCount > 0) {
-      return res.json({ exists: true });
+      return res.json({ exists: true, userType: 'driver' });
     }
-
+    
     // Check in Passenger collection
     const passengerCount = await Passenger.count({ where: { email } });
-    console.log('Passenger count:', passengerCount); // Log count
-
     if (passengerCount > 0) {
-      return res.json({ exists: true });
+      return res.json({ exists: true, userType: 'passenger' });
     }
-
+    
     // If user not found in either collection
     return res.json({ exists: false });
   } catch (error) {
