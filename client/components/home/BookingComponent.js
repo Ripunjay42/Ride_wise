@@ -74,6 +74,11 @@ const BookingApp = () => {
     setVehicles([]);
     setSelectedVehicle('');
     setShowPrices(false);
+    setMap(null);
+    setDistance(null);
+    setPickupMarker(null);
+    setDropoffMarker(null);
+    setUserLocationMarker(null);
     if (pickupMarker) pickupMarker.remove();
     if (dropoffMarker) dropoffMarker.remove();
   };
