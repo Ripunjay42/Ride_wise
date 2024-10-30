@@ -381,8 +381,8 @@ const BookingApp = () => {
             </CardContent>
           </Card>
         </div>
-        <div className="flex-1 mt-24">
-          <div className="w-full h-96" ref={mapContainer}></div>
+        <div className="flex-1 mt-16">
+          <div className="w-full h-[400px]" ref={mapContainer}></div>
         </div>
       </div>
     </div>

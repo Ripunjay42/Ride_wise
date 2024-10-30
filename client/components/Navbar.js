@@ -111,7 +111,7 @@ const Navbar = () => {
 
                 {/* Profile dropdown menu */}
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-28 rounded-md shadow-lg bg-white text-black">
+                  <div className="absolute right-0 mt-4 w-28 rounded-md shadow-lg bg-white text-black border-gray-400 border-2 ">
                     <div className="py-1">
                       {/* <div className="px-4 py-2 text-sm border-b border-gray-200">
                         {userName}
@@ -149,7 +149,7 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 bg-black">
-            <Link href="/">
+            <Link href="/help">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Help</button>
             </Link>
             <Link href="/">

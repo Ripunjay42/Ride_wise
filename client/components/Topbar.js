@@ -82,7 +82,7 @@ const TopBar = () => {
 
               {/* Profile dropdown menu */}
               {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-28 rounded-md shadow-lg bg-white text-black">
+                <div className="absolute right-0 mt-4 w-28 rounded-md shadow-lg bg-white text-black border-gray-400 border-2">
                   <div className="py-1">
                     {/* <div className="px-4 py-2 text-sm border-b border-gray-200">
                       {userEmail}
