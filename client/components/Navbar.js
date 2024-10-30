@@ -74,7 +74,7 @@ const Navbar = () => {
 
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/">
+            <Link href="/help">
               <button className="px-4 py-2 text-white hover:text-gray-200">Help</button>
             </Link>
             <Link href="/">
