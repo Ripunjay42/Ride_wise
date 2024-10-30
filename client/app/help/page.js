@@ -30,22 +30,25 @@ const HelpSection = () => {
     {
       icon: Bike,
       title: "Bikes & Scooters",
-      href: "/help/BikesScootersHelp"
+      // href: "/help/BikesScootersHelp"
+      href: "/help/RidersHelp"
     },
     {
       icon: Briefcase,
       title: "Business",
-      href: "/help/BusinessHelp"
+      // href: "/help/BusinessHelp"
+      href: "/help/RidersHelp"
     },
     {
       icon: Truck,
       title: "Freight",
-      href: "/help/FreightHelp"
+      // href: "/help/FreightHelp"
+      href: "/help/RidersHelp"
     }
   ];
 
   return (
-    <div className="bg-gray-50 py-16">
+    <div className="bg-gray-50 py-16 mt-20">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Welcome to RideWise Support</h2>
