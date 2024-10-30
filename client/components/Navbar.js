@@ -23,6 +23,7 @@ const Navbar = () => {
           // Check if user exists in backend and is fully registered and is passenger
           const response = await axios.get(`http://localhost:3001/api/auth/user/${user.email}`);
           setIsRegistrationComplete(response.data.userType === 'passenger');
+          console.log('Checking user registration:', response.data);
           if (response.data.userType === 'passenger') {
             setIsLoggedIn(true);
             setUserEmail(user.email);

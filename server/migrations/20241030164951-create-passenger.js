@@ -1,17 +1,11 @@
-// migrations/XXXXXX-create-passenger-table.js
 'use strict';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // First create the ENUM type
-    await queryInterface.sequelize.query(
-      `CREATE TYPE "enum_passengers_status" AS ENUM ('active', 'inactive');`
-    );
-
     await queryInterface.createTable('Passengers', {
       id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        defaultValue: Sequelize.fn('uuid_generate_v4'),
         primaryKey: true
       },
       email: {
@@ -31,25 +25,25 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      gender: {
+        type: Sequelize.STRING(20),
+        allowNull: false
+      },
       status: {
-        type: "enum_passengers_status",
+        type: Sequelize.STRING(20),
         defaultValue: 'active'
       },
       createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Passengers');
-    // Drop the ENUM type
-    await queryInterface.sequelize.query(
-      `DROP TYPE IF EXISTS "enum_passengers_status";`
-    );
   }
 };

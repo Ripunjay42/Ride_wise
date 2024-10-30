@@ -312,9 +312,11 @@ const BookingApp = () => {
                       className="w-full border-none focus:outline-none"
                       value={selectedDate}
                       onChange={handleDateChange}
+                      min={new Date().toISOString().split("T")[0]} // Set minimum date to today
                     />
                   </div>
                 </div>
+
                 <div>
                   <label className="block font-medium mb-1">Select Time</label>
                   <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">

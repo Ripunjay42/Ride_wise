@@ -1,4 +1,3 @@
-// models/passenger.js
 const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Passenger = sequelize.define('Passenger', {
@@ -24,9 +23,21 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    gender: {
+      type: DataTypes.STRING(20),
+      allowNull: false
+    },
     status: {
-      type: DataTypes.ENUM('active', 'inactive'),
+      type: DataTypes.STRING(20),
       defaultValue: 'active'
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
     }
   }, {
     timestamps: true

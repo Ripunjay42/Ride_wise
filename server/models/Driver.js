@@ -1,4 +1,3 @@
-// models/driver.js
 const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Driver = sequelize.define('Driver', {
@@ -43,8 +42,28 @@ module.exports = (sequelize) => {
       defaultValue: false
     },
     status: {
-      type: DataTypes.ENUM('active', 'inactive'),
+      type: DataTypes.STRING(20),
       defaultValue: 'inactive'
+    },
+    licenseValidity: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    gender: {
+      type: DataTypes.STRING(20),
+      allowNull: false
+    },
+    rating: {
+      type: DataTypes.DECIMAL(3, 2),
+      defaultValue: 0.00
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
     }
   }, {
     timestamps: true

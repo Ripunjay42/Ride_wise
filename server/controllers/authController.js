@@ -2,7 +2,7 @@ const { Driver, Passenger } = require('../models'); // Import models
 
 // Function to handle user signup
 const signup = async (req, res) => {
-  const { email, firstName, lastName, phoneNumber, userType, licenseNumber, vehicleNumber, vehicleType } = req.body;
+  const { email, firstName, lastName, phoneNumber, userType, gender, licenseNumber, vehicleNumber, vehicleType, isAvailable, licenseValidity } = req.body;
 
   try {
     // Check user type and create accordingly
@@ -15,8 +15,11 @@ const signup = async (req, res) => {
         licenseNumber,
         vehicleNumber,
         vehicleType,
-        isAvailable: true,
-        status: 'active'
+        gender,
+        isAvailable,
+        status: 'active',
+        licenseValidity,
+        rating: 5.0
       });
       return res.status(201).json({ message: 'Driver registered successfully', driver: newDriver });
     } else if (userType === 'passenger') {
@@ -25,6 +28,7 @@ const signup = async (req, res) => {
         firstName,
         lastName,
         phoneNumber,
+        gender,
         status: 'active'
       });
       return res.status(201).json({ message: 'Passenger registered successfully', passenger: newPassenger });

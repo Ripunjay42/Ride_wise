@@ -1,20 +1,11 @@
 'use strict';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Create the ENUM type for status only if it doesn't exist
-    await queryInterface.sequelize.query(`
-      DO $$
-      BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_drivers_status') THEN
-          CREATE TYPE "enum_drivers_status" AS ENUM ('active', 'inactive');
-        END IF;
-      END$$;
-    `);
-
     await queryInterface.createTable('Drivers', {
       id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        defaultValue: Sequelize.fn('uuid_generate_v4'),
         primaryKey: true
       },
       email: {
@@ -53,29 +44,32 @@ module.exports = {
         defaultValue: false
       },
       status: {
-        type: "enum_drivers_status",
+        type: Sequelize.STRING(20),
         defaultValue: 'inactive'
       },
+      licenseValidity: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      gender: {
+        type: Sequelize.STRING(20),
+        allowNull: false
+      },
+      rating: {
+        type: Sequelize.DECIMAL(3, 2),
+        defaultValue: 0.00
+      },
       createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Drivers');
-    // Only attempt to drop the ENUM if it exists
-    await queryInterface.sequelize.query(`
-      DO $$
-      BEGIN
-        IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_drivers_status') THEN
-          DROP TYPE "enum_drivers_status";
-        END IF;
-      END$$;
-    `);
   }
 };
