@@ -70,7 +70,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <span className="text-2xl font-bold">Ridewise</span>
+              <span className="text-2xl font-bold">RideWise</span>
             </Link>
           </div>
 
@@ -79,13 +79,13 @@ const Navbar = () => {
             <Link href="/help">
               <button className="px-4 py-2 text-white hover:text-gray-200">Help</button>
             </Link>
-            <Link href="/">
+            <Link href="/about">
               <button className="px-4 py-2 text-white hover:text-gray-200">About</button>
             </Link>
             <Link href="/">
               <button className="px-4 py-2 text-white hover:text-gray-200">Services</button>
             </Link>
-            <Link href="/">
+            <Link href="/contact">
               <button className="px-4 py-2 text-white hover:text-gray-200">Contact</button>
             </Link>
             

@@ -20,30 +20,27 @@ const HelpSection = () => {
     {
       icon: Car,
       title: "Riders",
-      href: "/help/RidersHelp"
+      href: "/help/riders"
     },
     {
       icon: LifeBuoy,
       title: "Driving & Delivering",
-      href: "/help/DrivingDeliveringHelp"
+      href: "/help/driving-and-delivering"
     },
     {
       icon: Bike,
       title: "Bikes & Scooters",
-      // href: "/help/BikesScootersHelp"
-      href: "/help/RidersHelp"
+      href: "/help/bikes-and-scooters"
     },
     {
       icon: Briefcase,
       title: "Business",
-      // href: "/help/BusinessHelp"
-      href: "/help/RidersHelp"
+      href: "/help/business"
     },
     {
       icon: Truck,
       title: "Freight",
-      // href: "/help/FreightHelp"
-      href: "/help/RidersHelp"
+      href: "/help/freight"
     }
   ];
 
