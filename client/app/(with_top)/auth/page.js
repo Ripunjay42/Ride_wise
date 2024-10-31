@@ -107,6 +107,12 @@ const AuthFlow = () => {
       if (response.data.exists) {
         setRegistrationComplete(true);
         router.push(response.data.userType === 'driver' ? '/dashboard' : '/');
+      }else{
+        setFormData({
+          ...formData,
+          email: userCredential.user.email
+        });
+        setStep('profile');
       } 
     }catch (error) {
       setError('Login failed. Please check your credentials and try again.');

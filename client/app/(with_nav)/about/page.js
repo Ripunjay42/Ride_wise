@@ -4,7 +4,7 @@ import React from 'react';
 
 const AboutPage = () => {
   return (
-    <div className="font-sans">
+    <div className="font-sans ">
       <section className="relative bg-cover bg-center h-screen text-white" style={{ backgroundImage: "url('/your-hero-image.jpg')" }}>
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative z-10 flex flex-col justify-center items-center h-full text-center">
@@ -63,8 +63,8 @@ The idea for RideWise was born on a snowy night in Tezpur University in 2024, an
         <div className="max-w-5xl mx-auto px-6 text-center">
           <p>&copy; {new Date().getFullYear()} RideWise. All rights reserved.</p>
           <nav className="mt-4">
-            <a href="/careers" className="mr-4 text-gray-300 hover:text-white">Careers</a>
-            <a href="/press" className="mr-4 text-gray-300 hover:text-white">Press</a>
+            <a href="" className="mr-4 text-gray-300 hover:text-white">Careers</a>
+            <a href="" className="mr-4 text-gray-300 hover:text-white">Press</a>
             <a href="/contact" className="text-gray-300 hover:text-white">Contact Us</a>
           </nav>
         </div>

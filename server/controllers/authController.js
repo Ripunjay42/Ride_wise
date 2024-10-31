@@ -43,23 +43,48 @@ const signup = async (req, res) => {
 
 
 
+// const checkUserExistence = async (req, res) => {
+//   const { email } = req.params;
+//   console.log('Checking existence for email:', email);
+  
+//   try {
+//     // Check in Driver collection
+//     const driverCount = await Driver.count({ where: { email } });
+//     if (driverCount > 0) {
+//       return res.json({ exists: true, userType: 'driver'});
+//     }
+    
+//     // Check in Passenger collection
+//     const passengerCount = await Passenger.count({ where: { email } });
+//     if (passengerCount > 0) {
+//       return res.json({ exists: true, userType: 'passenger'});
+//     }
+    
+//     // If user not found in either collection
+//     return res.json({ exists: false });
+//   } catch (error) {
+//     console.error('Error checking user existence:', error);
+//     return res.status(500).json({ error: 'An error occurred while checking user existence' });
+//   }
+// };
+
 const checkUserExistence = async (req, res) => {
   const { email } = req.params;
   console.log('Checking existence for email:', email);
-  
+
   try {
     // Check in Driver collection
-    const driverCount = await Driver.count({ where: { email } });
-    if (driverCount > 0) {
-      return res.json({ exists: true, userType: 'driver' });
+    const driver = await Driver.findOne({ where: { email } });
+    if (driver) {
+      return res.json({ exists: true, userType: 'driver', userName: driver.firstName });
     }
-    
+
     // Check in Passenger collection
-    const passengerCount = await Passenger.count({ where: { email } });
-    if (passengerCount > 0) {
-      return res.json({ exists: true, userType: 'passenger' });
+    const passenger = await Passenger.findOne({ where: { email } });
+    if (passenger) {
+      return res.json({ exists: true, userType: 'passenger', userName: passenger.firstName });
     }
-    
+
     // If user not found in either collection
     return res.json({ exists: false });
   } catch (error) {
@@ -67,6 +92,7 @@ const checkUserExistence = async (req, res) => {
     return res.status(500).json({ error: 'An error occurred while checking user existence' });
   }
 };
+
 
 
 

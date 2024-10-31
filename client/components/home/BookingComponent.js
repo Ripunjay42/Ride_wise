@@ -18,12 +18,30 @@ const CardHeader = ({ children }) => (
 
 const CardTitle = ({ children }) => (
   <h2 className="text-2xl font-bold mb-2 flex items-center">
-  <i className="fas fa-car mr-4 text-blue-500"></i> {/* Icon for Book a Ride */}
-  {children}
-</h2>
+    <i className="fas fa-car mr-4 text-blue-500"></i>
+    {children}
+  </h2>
 );
 
 const CardContent = ({ children }) => <div>{children}</div>;
+
+const SearchField = ({ icon, placeholder, value, onChange, onClear }) => (
+  <div className="flex items-center w-full border border-gray-300 rounded-md px-3 py-2">
+    <i className={`fas fa-map-marker-alt mr-2 ${icon}`}></i>
+    <input
+      type="text"
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full focus:outline-none"
+    />
+    {value && (
+      <button onClick={onClear} className="ml-2 text-gray-400 hover:text-gray-600">
+        <i className="fas fa-times"></i>
+      </button>
+    )}
+  </div>
+);
 
 const BookingApp = () => {
   const [pickupLocation, setPickupLocation] = useState('');
@@ -41,6 +59,10 @@ const BookingApp = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
+  const [allfields, setAllfields] = useState(false);
+  const [allfmsg, setAllfmsg] = useState(false);
+  const [pickupGeocoder, setPickupGeocoder] = useState(null);
+  const [dropoffGeocoder, setDropoffGeocoder] = useState(null);
 
   const mapContainer = useRef(null);
 
@@ -250,15 +272,22 @@ const BookingApp = () => {
   };
 
   const handleSeePricesClick = () => {
-    if (!isLoggedIn || !isRegistrationComplete) {
-      setShowLoginMessage(true);
-      setShowPrices(false);
+    if (!isLoggedIn || !isRegistrationComplete) 
+      {
+        setShowLoginMessage(true);
+        setShowPrices(false);
+        setTimeout(() => {
+        setShowLoginMessage(false);
+        setAllfields(false);
+      }, 3000);
       return;
     }
 
     if (pickupLocation && dropoffLocation && selectedDate && selectedTime) {
       setShowPrices(true);
+      setAllfields(true);
       setShowLoginMessage(false);
+      setAllfmsg(false);
       const demoVehicles = [
         { type: 'Car1', price: '₹500' },
         { type: 'Car2', price: '₹700' },
@@ -266,6 +295,14 @@ const BookingApp = () => {
       ];
       setVehicles(demoVehicles);
     }
+
+    if(!allfields){
+      setAllfmsg(true);
+      setTimeout(() => {
+        setAllfmsg(false);
+      }, 3000);
+    }
+    
   };
 
   const handleBookClick = () => {
@@ -338,7 +375,18 @@ const BookingApp = () => {
 
                 {showLoginMessage && (
                   <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-red-600 mb-2">Please log in to see prices and book a ride.</p>
+                    <p className="text-red-600 mb-2">Please log in as a passenger and see prices and book a ride.</p>
+                    {/* <Link href="/auth">
+                      <button className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                        Login / Sign Up
+                      </button>
+                    </Link> */}
+                  </div>
+                )}
+
+                  {allfmsg && !allfields && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <p className="text-red-600 mb-2">Please fill all the required fields.</p>
                     {/* <Link href="/auth">
                       <button className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
                         Login / Sign Up

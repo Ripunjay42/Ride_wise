@@ -15,6 +15,7 @@ const Navbar = () => {
   const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userType, setUserType] = useState('');
+  const [userName, setUserName] = useState('');
 
   // Listen to auth state changes and check registration status
   useEffect(() => {
@@ -23,12 +24,13 @@ const Navbar = () => {
         try {
           // Check if user exists in backend and is fully registered and is passenger
           const response = await axios.get(`http://localhost:3001/api/auth/user/${user.email}`);
-          setIsRegistrationComplete(response.data.userType === 'passenger');
+          setIsRegistrationComplete(response.data.exists);
           console.log('Checking user registration:', response.data);
-          if (response.data.userType === 'passenger') {
+          if (response.data.exists) {
             setIsLoggedIn(true);
             setUserEmail(user.email);
             setUserType(response.data.userType || '');
+            setUserName(response.data.userName || '');
           } else {
             setIsLoggedIn(false);
             setUserEmail('');
@@ -113,12 +115,12 @@ const Navbar = () => {
                 {isProfileMenuOpen && (
                   <div className="absolute right-0 mt-4 w-28 rounded-md shadow-lg bg-white text-black border-gray-700 border-[2px]">
                     <div className="py-1">
-                      {/* <div className="px-4 py-2 text-sm border-b border-gray-200">
+                      <div className="px-4 py-2 text-sm border-b border-gray-200">
                         {userName}
                       </div>
                       <div className="px-4 py-2 text-sm border-b border-gray-200">
                         {userType.charAt(0).toUpperCase() + userType.slice(1)}
-                      </div> */}
+                      </div>
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center space-x-2 font-extrabold text-black"
@@ -173,12 +175,12 @@ const Navbar = () => {
               </>
             ) : (
               <div className="space-y-1">
-                {/* <div className="px-4 py-2 text-sm text-gray-300">
-                  {userEmail}
+                <div className="px-4 py-4 text-xs text-gray-300">
+                  {userName}
                 </div>
                 <div className="px-4 py-2 text-sm text-gray-300">
                   {userType.charAt(0).toUpperCase() + userType.slice(1)}
-                </div> */}
+                </div>
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 text-white hover:bg-gray-900 rounded flex items-center space-x-2"

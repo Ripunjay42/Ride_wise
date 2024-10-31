@@ -20,8 +20,8 @@ const driving = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 mt-24">
-      <h1 className="text-3xl font-bold mb-6">Support Resources for Drivers & Deliveries</h1>
+    <div className="max-w-3xl mx-auto px-4 py-8 mt-24">
+      <h1 className="text-3xl font-bold mb-6">Support Resources for RideWise for Business</h1>
       <ul className="divide-y divide-gray-200">
         {helpTopics.map((topic, index) => (
           <li key={index} className="py-4">
