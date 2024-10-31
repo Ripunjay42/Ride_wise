@@ -92,10 +92,10 @@ const Navbar = () => {
             {!isLoggedIn || !isRegistrationComplete ? (
               <>
                 <Link href="/auth">
-                  <button className="px-4 py-2 text-white hover:text-gray-200">Log in</button>
+                  <button className="px-3 py-2 text-white hover:text-gray-200">Log in</button>
                 </Link>
                 <Link href="/auth">
-                  <button className="px-4 py-2 bg-white text-black font-medium rounded hover:bg-gray-100 transition-colors">
+                  <button className="px-3 py-2 bg-white text-black font-medium rounded hover:bg-gray-100 transition-colors">
                     Sign up
                   </button>
                 </Link>
@@ -111,7 +111,7 @@ const Navbar = () => {
 
                 {/* Profile dropdown menu */}
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 mt-4 w-28 rounded-md shadow-lg bg-white text-black border-gray-400 border-2 ">
+                  <div className="absolute right-0 mt-4 w-28 rounded-md shadow-lg bg-white text-black border-gray-700 border-[2px]">
                     <div className="py-1">
                       {/* <div className="px-4 py-2 text-sm border-b border-gray-200">
                         {userName}
