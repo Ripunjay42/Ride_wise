@@ -154,9 +154,10 @@ const BookingApp = () => {
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [allfields, setAllfields] = useState(false);
   const [allfmsg, setAllfmsg] = useState(false);
+  const [distance, setDistance] = useState(null);
+  const [duration, setDuration] = useState(null);
 
   const mapContainer = useRef(null);
-
 
   const useDebounce = (value, delay) => {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -177,9 +178,6 @@ const BookingApp = () => {
   const debouncedPickupSearch = useDebounce(pickupSearch, 300);
   const debouncedDropoffSearch = useDebounce(dropoffSearch, 300);
 
-
-
-  // Effect for fetching suggestions
   useEffect(() => {
     fetchSuggestions(debouncedPickupSearch, true);
   }, [debouncedPickupSearch]);
@@ -188,14 +186,90 @@ const BookingApp = () => {
     fetchSuggestions(debouncedDropoffSearch, false);
   }, [debouncedDropoffSearch]);
 
-  const handleSuggestionClick = (suggestion, isPickup = true) => {
+  const clearRoute = () => {
+    if (map) {
+      if (map.getSource('route')) {
+        map.removeLayer('route');
+        map.removeSource('route');
+      }
+      setDistance(null);
+      setDuration(null);
+    }
+  };
+
+  const getRoute = async (pickup, dropoff) => {
+    try {
+      // Clear existing route
+      clearRoute();
+
+      const query = await fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/driving/${pickup[0]},${pickup[1]};${dropoff[0]},${dropoff[1]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`
+      );
+      const json = await query.json();
+      
+      if (json.routes && json.routes[0]) {
+        const data = json.routes[0];
+        const route = data.geometry;
+        
+        // Calculate distance and duration
+        const distanceInKm = (data.distance / 1000).toFixed(2);
+        const durationInMinutes = Math.round(data.duration / 60);
+        setDistance(distanceInKm);
+        setDuration(durationInMinutes);
+
+        // Create GeoJSON object
+        const geojson = {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: route.coordinates
+          }
+        };
+
+        // Add the route layer
+        map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: {
+            type: 'geojson',
+            data: geojson
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#3887be',
+            'line-width': 5,
+            'line-opacity': 0.75
+          }
+        });
+
+        // Fit map to show the entire route
+        const coordinates = route.coordinates;
+        const bounds = coordinates.reduce((bounds, coord) => {
+          return bounds.extend(coord);
+        }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+        map.fitBounds(bounds, {
+          padding: 50,
+          duration: 1000
+        });
+      }
+    } catch (error) {
+      console.error('Error getting route:', error);
+    }
+  };
+
+  const handleSuggestionClick = async (suggestion, isPickup = true) => {
     const [lng, lat] = suggestion.center;
     const placeName = suggestion.place_name;
 
     if (isPickup) {
       setPickupLocation(placeName);
       setPickupSearch(placeName);
-      setPickupSuggestions([]); // Clear suggestions immediately
+      setPickupSuggestions([]);
       if (pickupMarker) pickupMarker.remove();
       const newMarker = new mapboxgl.Marker({ color: '#00ff00' })
         .setLngLat([lng, lat])
@@ -204,7 +278,7 @@ const BookingApp = () => {
     } else {
       setDropoffLocation(placeName);
       setDropoffSearch(placeName);
-      setDropoffSuggestions([]); // Clear suggestions immediately
+      setDropoffSuggestions([]);
       if (dropoffMarker) dropoffMarker.remove();
       const newMarker = new mapboxgl.Marker({ color: '#ff0000' })
         .setLngLat([lng, lat])
@@ -212,13 +286,17 @@ const BookingApp = () => {
       setDropoffMarker(newMarker);
     }
 
-    map.flyTo({
-      center: [lng, lat],
-      zoom: 14,
-    });
+    // Draw route only if both markers are present
+    if (pickupMarker || !isPickup) {
+      const pickup = isPickup ? [lng, lat] : pickupMarker.getLngLat().toArray();
+      const dropoff = isPickup ? dropoffMarker.getLngLat().toArray() : [lng, lat];
+      
+      if (pickup && dropoff) {
+        await getRoute(pickup, dropoff);
+      }
+    }
   };
 
-  // Update the fetchSuggestions function to clear suggestions when query is empty
   const clearPickupLocation = () => {
     setPickupLocation('');
     setPickupSearch('');
@@ -226,6 +304,10 @@ const BookingApp = () => {
       pickupMarker.remove();
       setPickupMarker(null);
     }
+    clearRoute();
+    setShowPrices(false);
+    setVehicles([]);
+    setSelectedVehicle('');
   };
 
   const clearDropoffLocation = () => {
@@ -235,6 +317,10 @@ const BookingApp = () => {
       dropoffMarker.remove();
       setDropoffMarker(null);
     }
+    clearRoute();
+    setShowPrices(false);
+    setVehicles([]);
+    setSelectedVehicle('');
   };
 
   const fetchSuggestions = async (query, isPickup = true) => {
@@ -264,6 +350,41 @@ const BookingApp = () => {
       isPickup ? setIsLoadingPickup(false) : setIsLoadingDropoff(false);
     }
   };
+
+  useEffect(() => {
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
+
+    const initializeMap = () => {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        
+        const newMap = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/streets-v12',
+          center: [longitude, latitude],
+          zoom: 12
+        });
+
+        newMap.on('load', () => {
+          setMap(newMap);
+        });
+
+        const marker = new mapboxgl.Marker({ color: '#0000ff' })
+          .setLngLat([longitude, latitude])
+          .addTo(newMap);
+        setUserLocationMarker(marker);
+      });
+    };
+
+    initializeMap();
+
+    return () => {
+      if (map) map.remove();
+      if (userLocationMarker) userLocationMarker.remove();
+      if (pickupMarker) pickupMarker.remove();
+      if (dropoffMarker) dropoffMarker.remove();
+    };
+  }, []);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -345,31 +466,31 @@ const BookingApp = () => {
     mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
 
     const initializeMap = () => {
-      const newMap = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [-74.5, 40],
-        zoom: 9,
-      });
-
-      newMap.on('load', () => {
-        setMap(newMap);
-      });
-
+      // Instead of setting initial coordinates, wait for geolocation
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
+        
+        // Create map directly at user's location
+        const newMap = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/streets-v11',
+          center: [longitude, latitude], // Set initial center to user's location
+          zoom: 12
+        });
+
+        newMap.on('load', () => {
+          setMap(newMap);
+        });
+
+        // Add user location marker
         const marker = new mapboxgl.Marker({ color: '#0000ff' })
           .setLngLat([longitude, latitude])
           .addTo(newMap);
         setUserLocationMarker(marker);
-        newMap.flyTo({
-          center: [longitude, latitude],
-          zoom: 12,
-        });
       });
 
       return () => {
-        newMap.remove();
+        if (map) map.remove();
         if (userLocationMarker) userLocationMarker.remove();
         if (pickupMarker) pickupMarker.remove();
         if (dropoffMarker) dropoffMarker.remove();
@@ -379,12 +500,19 @@ const BookingApp = () => {
     initializeMap();
   }, []);
 
+
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
+    setShowPrices(false);
+    setVehicles([]);
+    setSelectedVehicle('')
   };
 
   const handleTimeChange = (event) => {
     setSelectedTime(event.target.value);
+    setShowPrices(false);
+    setVehicles([]);
+    setSelectedVehicle('')
   };
 
   const handleSeePricesClick = () => {
@@ -466,6 +594,28 @@ const BookingApp = () => {
                   </div>
                 </div>
 
+                {distance && duration && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="flex items-center">
+                        <i className="fas fa-route mr-2 text-blue-500"></i>
+                        <span className="font-medium">Distance:</span>
+                        <span className="ml-2">{distance} km</span>
+                      </div>
+                      <div className="flex items-center">
+                        <i className="fas fa-clock mr-2 text-blue-500"></i>
+                        <span className="font-medium">Duration:</span>
+                        <span className="ml-2">{duration} mins</span>
+                      </div>
+                      <div className="flex items-center">
+                        <i className="fas fa-money-bill-wave mr-2 text-green-500"></i>
+                        <span className="font-medium">Estimated Fare:</span>
+                        <span className="ml-2">₹{Math.round(distance * 20)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label className="block font-medium mb-1">Select Date</label>
                   <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
@@ -492,9 +642,11 @@ const BookingApp = () => {
                     />
                   </div>
                 </div>
+
                 <button
                   onClick={handleSeePricesClick}
                   className="w-full group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:from-blue-600 hover:to-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  disabled={!pickupLocation || !dropoffLocation || !selectedDate || !selectedTime}
                 >
                   <div className="absolute inset-0 w-3 bg-gradient-to-r from-white to-transparent opacity-10 transform -skew-x-12 group-hover:animate-shine"></div>
                   <i className="fas fa-tag mr-2 group-hover:animate-wiggle"></i>
@@ -503,7 +655,15 @@ const BookingApp = () => {
 
                 {showLoginMessage && (
                   <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-red-600 mb-2">Please log in as a passenger to see prices and book a ride.</p>
+                    <p className="text-red-600 mb-2">
+                      Please log in as a passenger to see prices and book a ride.
+                    </p>
+                    <Link 
+                      href="/login" 
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Login here
+                    </Link>
                   </div>
                 )}
 
@@ -514,33 +674,53 @@ const BookingApp = () => {
                 )}
 
                 {showPrices && (
-                  <div className="mt-4">
-                    <h3 className="font-bold">Available Vehicles:</h3>
-                    <ul className="list-disc list-inside">
+                  <div className="mt-4 space-y-4">
+                    <h3 className="font-bold text-lg">Available Vehicles:</h3>
+                    <div className="grid gap-4">
                       {vehicles.map((vehicle, index) => (
-                        <li key={index} className="flex items-center">
-                          <input
-                            type="radio"
-                            id={`vehicle-${index}`}
-                            name="vehicle"
-                            value={vehicle.type}
-                            onChange={(e) => setSelectedVehicle(e.target.value)}
-                          />
-                          <label htmlFor={`vehicle-${index}`} className="ml-2">
-                            {vehicle.type} - {vehicle.price}
-                          </label>
-                        </li>
+                        <div 
+                          key={index}
+                          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
+                            selectedVehicle === vehicle.type 
+                              ? 'border-blue-500 bg-blue-50' 
+                              : 'border-gray-200 hover:border-blue-300'
+                          }`}
+                          onClick={() => setSelectedVehicle(vehicle.type)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="radio"
+                                id={`vehicle-${index}`}
+                                name="vehicle"
+                                value={vehicle.type}
+                                checked={selectedVehicle === vehicle.type}
+                                onChange={(e) => setSelectedVehicle(e.target.value)}
+                                className="w-4 h-4 text-blue-600"
+                              />
+                              <label 
+                                htmlFor={`vehicle-${index}`}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <i className="fas fa-car text-gray-600"></i>
+                                <span className="font-medium">{vehicle.type}</span>
+                              </label>
+                            </div>
+                            <span className="font-semibold text-lg">{vehicle.price}</span>
+                          </div>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
                 
                 {selectedVehicle && (
                   <button
                     onClick={handleBookClick}
-                    className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 mt-4"
+                    className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors duration-200"
                   >
-                    Book {selectedVehicle}
+                    <i className="fas fa-check-circle"></i>
+                    <span>Book {selectedVehicle}</span>
                   </button>
                 )}
               </div>
@@ -548,7 +728,7 @@ const BookingApp = () => {
           </Card>
         </div>
         <div className="flex-1 mt-8">
-          <div className="w-full h-[500px]" ref={mapContainer}></div>
+          <div className="w-full h-[500px] rounded-lg overflow-hidden shadow-lg" ref={mapContainer}></div>
         </div>
       </div>
     </div>
