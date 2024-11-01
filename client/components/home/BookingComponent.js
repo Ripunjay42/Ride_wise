@@ -712,7 +712,7 @@ const BookingApp = () => {
                       Please log in as a passenger to see prices and book a ride.
                     </p>
                     <Link 
-                      href="/login" 
+                      href="/auth" 
                       className="text-blue-600 hover:text-blue-800 underline"
                     >
                       Login here
