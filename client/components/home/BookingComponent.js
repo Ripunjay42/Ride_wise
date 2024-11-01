@@ -262,6 +262,12 @@ const BookingApp = () => {
     }
   };
 
+  const vehicleTypes = {
+    'Sedan': { baseRate: 10, vehicles: ['Toyota Camry', 'Honda Civic'] },
+    'SUV': { baseRate: 20, vehicles: ['Toyota Fortuner', 'Ford Endeavour'] },
+    'Luxury': { baseRate: 30, vehicles: ['Mercedes Benz', 'BMW 5 Series'] }
+  };
+
   const handleSuggestionClick = async (suggestion, isPickup = true) => {
     const [lng, lat] = suggestion.center;
     const placeName = suggestion.place_name;
@@ -275,6 +281,13 @@ const BookingApp = () => {
         .setLngLat([lng, lat])
         .addTo(map);
       setPickupMarker(newMarker);
+      
+      // Fly to the selected location
+      map.flyTo({
+        center: [lng, lat],
+        zoom: 14,
+        duration: 2000
+      });
     } else {
       setDropoffLocation(placeName);
       setDropoffSearch(placeName);
@@ -284,10 +297,17 @@ const BookingApp = () => {
         .setLngLat([lng, lat])
         .addTo(map);
       setDropoffMarker(newMarker);
+      
+      // Fly to the selected location
+      map.flyTo({
+        center: [lng, lat],
+        zoom: 8,
+        duration: 2000
+      });
     }
 
     // Draw route only if both markers are present
-    if (pickupMarker || !isPickup) {
+    if ((isPickup && dropoffMarker) || (!isPickup && pickupMarker)) {
       const pickup = isPickup ? [lng, lat] : pickupMarker.getLngLat().toArray();
       const dropoff = isPickup ? dropoffMarker.getLngLat().toArray() : [lng, lat];
       
@@ -531,12 +551,22 @@ const BookingApp = () => {
       setAllfields(true);
       setShowLoginMessage(false);
       setAllfmsg(false);
-      const demoVehicles = [
-        { type: 'Car1', price: '₹500' },
-        { type: 'Car2', price: '₹700' },
-        { type: 'Car3', price: '₹1000' },
-      ];
-      setVehicles(demoVehicles);
+
+      // Calculate prices for each vehicle based on distance
+      if (distance) {
+        const availableVehicles = [];
+        Object.entries(vehicleTypes).forEach(([type, details]) => {
+          details.vehicles.forEach(vehicleName => {
+            const price = Math.round(distance * details.baseRate);
+            availableVehicles.push({
+              type: type,
+              name: vehicleName,
+              price: `₹${price}`
+            });
+          });
+        });
+        setVehicles(availableVehicles);
+      }
     }
 
     if (!allfields) {
@@ -552,6 +582,51 @@ const BookingApp = () => {
       alert(`You have booked ${selectedVehicle}!`);
     }
   };
+
+
+  const renderVehiclesList = () => (
+    <div className="mt-4 space-y-4">
+      <h3 className="font-bold text-lg">Available Vehicles:</h3>
+      <div className="grid gap-4">
+        {vehicles.map((vehicle, index) => (
+          <div 
+            key={index}
+            className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
+              selectedVehicle === vehicle.name 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-blue-300'
+            }`}
+            onClick={() => setSelectedVehicle(vehicle.name)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  id={`vehicle-${index}`}
+                  name="vehicle"
+                  value={vehicle.name}
+                  checked={selectedVehicle === vehicle.name}
+                  onChange={(e) => setSelectedVehicle(e.target.value)}
+                  className="w-4 h-4 text-blue-600"
+                />
+                <label 
+                  htmlFor={`vehicle-${index}`}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <i className="fas fa-car text-gray-600"></i>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{vehicle.name}</span>
+                    <span className="text-sm text-gray-500">{vehicle.type}</span>
+                  </div>
+                </label>
+              </div>
+              <span className="font-semibold text-lg">{vehicle.price}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="max-w-7xl mx-auto mt-20">
@@ -593,28 +668,6 @@ const BookingApp = () => {
                     />
                   </div>
                 </div>
-
-                {distance && duration && (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <div className="flex items-center">
-                        <i className="fas fa-route mr-2 text-blue-500"></i>
-                        <span className="font-medium">Distance:</span>
-                        <span className="ml-2">{distance} km</span>
-                      </div>
-                      <div className="flex items-center">
-                        <i className="fas fa-clock mr-2 text-blue-500"></i>
-                        <span className="font-medium">Duration:</span>
-                        <span className="ml-2">{duration} mins</span>
-                      </div>
-                      <div className="flex items-center">
-                        <i className="fas fa-money-bill-wave mr-2 text-green-500"></i>
-                        <span className="font-medium">Estimated Fare:</span>
-                        <span className="ml-2">₹{Math.round(distance * 20)}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 <div>
                   <label className="block font-medium mb-1">Select Date</label>
@@ -673,46 +726,7 @@ const BookingApp = () => {
                   </div>
                 )}
 
-                {showPrices && (
-                  <div className="mt-4 space-y-4">
-                    <h3 className="font-bold text-lg">Available Vehicles:</h3>
-                    <div className="grid gap-4">
-                      {vehicles.map((vehicle, index) => (
-                        <div 
-                          key={index}
-                          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-                            selectedVehicle === vehicle.type 
-                              ? 'border-blue-500 bg-blue-50' 
-                              : 'border-gray-200 hover:border-blue-300'
-                          }`}
-                          onClick={() => setSelectedVehicle(vehicle.type)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <input
-                                type="radio"
-                                id={`vehicle-${index}`}
-                                name="vehicle"
-                                value={vehicle.type}
-                                checked={selectedVehicle === vehicle.type}
-                                onChange={(e) => setSelectedVehicle(e.target.value)}
-                                className="w-4 h-4 text-blue-600"
-                              />
-                              <label 
-                                htmlFor={`vehicle-${index}`}
-                                className="flex items-center gap-2 cursor-pointer"
-                              >
-                                <i className="fas fa-car text-gray-600"></i>
-                                <span className="font-medium">{vehicle.type}</span>
-                              </label>
-                            </div>
-                            <span className="font-semibold text-lg">{vehicle.price}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {showPrices && renderVehiclesList()}
                 
                 {selectedVehicle && (
                   <button
@@ -729,7 +743,24 @@ const BookingApp = () => {
         </div>
         <div className="flex-1 mt-8">
           <div className="w-full h-[500px] rounded-lg overflow-hidden shadow-lg" ref={mapContainer}></div>
+          {distance && duration && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="flex items-center">
+                        <i className="fas fa-route mr-2 text-blue-500 text-xl"></i>
+                        <span className="font-extrabold text-2xl">Distance:</span>
+                        <span className="ml-2 font-extrabold text-2xl">{distance} km</span>
+                      </div>
+                      <div className="flex items-center ml-5">
+                        <i className="fas fa-clock mr-2 text-blue-500 text-xl"></i>
+                        <span className="font-extrabold text-2xl">Duration:</span>
+                        <span className="ml-2 font-extrabold text-2xl">{duration} mins</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
         </div>
+
       </div>
     </div>
   );
