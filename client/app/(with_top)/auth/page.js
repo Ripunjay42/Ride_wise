@@ -125,8 +125,16 @@ const AuthFlow = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+  
+    // Initialize the RecaptchaVerifier just before calling signInWithPhoneNumber
     try {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+          // reCAPTCHA solved
+        },
+      });
+  
       const confirmationResult = await signInWithPhoneNumber(
         auth,
         authData.phone,
@@ -139,7 +147,7 @@ const AuthFlow = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const handleVerifyCode = async (e) => {
     e.preventDefault();
