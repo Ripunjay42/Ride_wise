@@ -42,6 +42,48 @@ const BookingApp = () => {
 
   const mapContainer = useRef(null);
 
+
+  useEffect(() => {
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
+
+    if (mapContainer.current) {
+      initializeMap();
+    }
+  }, [mapContainer]);
+
+
+  
+  const initializeMap = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+
+      // Initialize the map
+      const newMap = new mapboxgl.Map({
+        container: mapContainer.current,  // Make sure this is an HTMLElement
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [longitude, latitude],
+        zoom: 12,
+      });
+
+      newMap.on('load', () => {
+        setMap(newMap);
+      });
+
+      // Add user location marker
+      const marker = new mapboxgl.Marker({ color: '#000000' })
+        .setLngLat([longitude, latitude])
+        .addTo(newMap);
+      setUserLocationMarker(marker);
+    });
+
+    return () => {
+      if (map) map.remove();
+      if (userLocationMarker) userLocationMarker.remove();
+      if (pickupMarker) pickupMarker.remove();
+      if (dropoffMarker) dropoffMarker.remove();
+    };
+  };
+
   const useDebounce = (value, delay) => {
     const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -60,12 +102,6 @@ const BookingApp = () => {
 
   const debouncedPickupSearch = useDebounce(pickupSearch, 300);
   const debouncedDropoffSearch = useDebounce(dropoffSearch, 300);
-
-  useEffect(() => {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
-
-    initializeMap();
-  }, []);
 
   useEffect(() => {
     fetchSuggestions(debouncedPickupSearch, true);
@@ -345,37 +381,6 @@ const BookingApp = () => {
     initializeMap();
   };
 
-  const initializeMap = () => {
-    // Instead of setting initial coordinates, wait for geolocation
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude } = position.coords;
-      
-      // Create map directly at user's location
-      const newMap = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [longitude, latitude], // Set initial center to user's location
-        zoom: 12,
-      });
-
-      newMap.on('load', () => {
-        setMap(newMap);
-      });
-
-      // Add user location marker
-      const marker = new mapboxgl.Marker({ color: '#000000' })
-        .setLngLat([longitude, latitude])
-        .addTo(newMap);
-      setUserLocationMarker(marker);
-    });
-
-    return () => {
-      if (map) map.remove();
-      if (userLocationMarker) userLocationMarker.remove();
-      if (pickupMarker) pickupMarker.remove();
-      if (dropoffMarker) dropoffMarker.remove();
-    };
-  };
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
