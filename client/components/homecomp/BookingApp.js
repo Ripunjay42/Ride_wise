@@ -62,6 +62,12 @@ const BookingApp = () => {
   const debouncedDropoffSearch = useDebounce(dropoffSearch, 300);
 
   useEffect(() => {
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
+
+    initializeMap();
+  }, []);
+
+  useEffect(() => {
     fetchSuggestions(debouncedPickupSearch, true);
   }, [debouncedPickupSearch]);
 
@@ -370,13 +376,6 @@ const BookingApp = () => {
       if (dropoffMarker) dropoffMarker.remove();
     };
   };
-
-  useEffect(() => {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
-
-    initializeMap();
-  }, []);
-
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
