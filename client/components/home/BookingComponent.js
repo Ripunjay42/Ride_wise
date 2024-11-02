@@ -240,7 +240,7 @@ const BookingApp = () => {
             'line-cap': 'round'
           },
           paint: {
-            'line-color': '#3887be',
+            'line-color': '#000000',
             'line-width': 5,
             'line-opacity': 0.75
           }
@@ -285,7 +285,7 @@ const BookingApp = () => {
       // Fly to the selected location
       map.flyTo({
         center: [lng, lat],
-        zoom: 14,
+        zoom: 12,
         duration: 2000
       });
     } else {
@@ -301,7 +301,7 @@ const BookingApp = () => {
       // Fly to the selected location
       map.flyTo({
         center: [lng, lat],
-        zoom: 8,
+        zoom: 12,
         duration: 2000
       });
     }
@@ -372,41 +372,6 @@ const BookingApp = () => {
   };
 
   useEffect(() => {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
-
-    const initializeMap = () => {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        
-        const newMap = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v12',
-          center: [longitude, latitude],
-          zoom: 12
-        });
-
-        newMap.on('load', () => {
-          setMap(newMap);
-        });
-
-        const marker = new mapboxgl.Marker({ color: '#0000ff' })
-          .setLngLat([longitude, latitude])
-          .addTo(newMap);
-        setUserLocationMarker(marker);
-      });
-    };
-
-    initializeMap();
-
-    return () => {
-      if (map) map.remove();
-      if (userLocationMarker) userLocationMarker.remove();
-      if (pickupMarker) pickupMarker.remove();
-      if (dropoffMarker) dropoffMarker.remove();
-    };
-  }, []);
-
-  useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user?.email) {
         try {
@@ -459,7 +424,7 @@ const BookingApp = () => {
 
         map.flyTo({
           center: [lng, lat],
-          zoom: 8,
+          zoom: 12,
         });
       }
     } catch (error) {
@@ -477,45 +442,54 @@ const BookingApp = () => {
     setVehicles([]);
     setSelectedVehicle('');
     setShowPrices(false);
-    setMap(null);
-    if (pickupMarker) pickupMarker.remove();
-    if (dropoffMarker) dropoffMarker.remove();
+    setDistance(null);
+    setDuration(null);
+    if (pickupMarker) {
+      pickupMarker.remove();
+      setPickupMarker(null);
+    }
+    if (dropoffMarker) {
+      dropoffMarker.remove();
+      setDropoffMarker(null);
+    }
+    clearRoute();
+    initializeMap();
+  };
+
+  const initializeMap = () => {
+    // Instead of setting initial coordinates, wait for geolocation
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      
+      // Create map directly at user's location
+      const newMap = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [longitude, latitude], // Set initial center to user's location
+        zoom: 12,
+      });
+
+      newMap.on('load', () => {
+        setMap(newMap);
+      });
+
+      // Add user location marker
+      const marker = new mapboxgl.Marker({ color: '#000000' })
+        .setLngLat([longitude, latitude])
+        .addTo(newMap);
+      setUserLocationMarker(marker);
+    });
+
+    return () => {
+      if (map) map.remove();
+      if (userLocationMarker) userLocationMarker.remove();
+      if (pickupMarker) pickupMarker.remove();
+      if (dropoffMarker) dropoffMarker.remove();
+    };
   };
 
   useEffect(() => {
     mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
-
-    const initializeMap = () => {
-      // Instead of setting initial coordinates, wait for geolocation
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        
-        // Create map directly at user's location
-        const newMap = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v11',
-          center: [longitude, latitude], // Set initial center to user's location
-          zoom: 12
-        });
-
-        newMap.on('load', () => {
-          setMap(newMap);
-        });
-
-        // Add user location marker
-        const marker = new mapboxgl.Marker({ color: '#0000ff' })
-          .setLngLat([longitude, latitude])
-          .addTo(newMap);
-        setUserLocationMarker(marker);
-      });
-
-      return () => {
-        if (map) map.remove();
-        if (userLocationMarker) userLocationMarker.remove();
-        if (pickupMarker) pickupMarker.remove();
-        if (dropoffMarker) dropoffMarker.remove();
-      };
-    };
 
     initializeMap();
   }, []);
@@ -641,7 +615,7 @@ const BookingApp = () => {
                 <div>
                   <div className="mb-4">
                     <label className="font-semibold text-lg">
-                      <i className="fas fa-map-marker-alt mr-3 text-green-500 text-3xl"></i>
+                      <i className="fas fa-map-marker-alt mr-3 text-black text-3xl"></i>
                       Search Locations
                     </label>
                   </div>
