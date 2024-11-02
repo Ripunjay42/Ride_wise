@@ -76,13 +76,13 @@ const checkUserExistence = async (req, res) => {
     // Check in Driver collection
     const driver = await Driver.findOne({ where: { email } });
     if (driver) {
-      return res.json({ exists: true, userType: 'driver', userName: driver.firstName });
+      return res.json({ exists: true, userType: 'driver', userName: driver.firstName, driverId: driver.id });
     }
 
     // Check in Passenger collection
     const passenger = await Passenger.findOne({ where: { email } });
     if (passenger) {
-      return res.json({ exists: true, userType: 'passenger', userName: passenger.firstName });
+      return res.json({ exists: true, userType: 'passenger', userName: passenger.firstName, passengerId: passenger.id });
     }
 
     // If user not found in either collection

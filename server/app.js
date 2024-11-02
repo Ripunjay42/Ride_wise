@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { sequelize } = require('./models');
 const authRoutes = require('./routes/authRoutes');
+const scheduleRoutes = require('./routes/scheduleRoutes');
 
 const app = express();
 app.use(cors());
@@ -14,6 +15,8 @@ const allowedOrigins = [
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api', scheduleRoutes);
+
 
 // Sync database and start the server
 sequelize.authenticate().then(() => {
