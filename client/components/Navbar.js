@@ -113,7 +113,7 @@ const Navbar = () => {
 
                 {/* Profile dropdown menu */}
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 mt-4 w-28 rounded-md shadow-lg bg-white text-black border-gray-700 border-[2px]">
+                  <div className="absolute right-[-60px] mt-4 w-36 rounded-md shadow-lg bg-white text-black border-gray-700 border-[2px]">
                     <div className="py-1">
                       <div className="px-4 py-2 text-sm border-b border-gray-200">
                         {userName}
