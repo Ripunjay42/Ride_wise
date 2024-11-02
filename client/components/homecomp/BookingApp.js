@@ -253,7 +253,10 @@ const BookingApp = () => {
     setShowPrices(false);
     setVehicles([]);
     setSelectedVehicle('');
-    initializeMap();
+    if(!dropoffMarker) 
+      {
+        initializeMap();
+      }
   };
 
   const clearDropoffLocation = () => {
@@ -267,7 +270,10 @@ const BookingApp = () => {
     setShowPrices(false);
     setVehicles([]);
     setSelectedVehicle('');
-    initializeMap();
+    if(!pickupMarker) 
+      {
+        initializeMap();
+      }
   };
 
   const fetchSuggestions = async (query, isPickup = true) => {
