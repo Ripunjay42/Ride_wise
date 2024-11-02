@@ -1,13 +1,13 @@
 //homepage.js
 'use client';
 import React from 'react';
-import BookingComponent  from '@/components/home/BookingComponent';
-import FeaturesSection from '@/components/home/FeatureSection';
+import BookingApp  from '@/components/homecomp/BookingApp';
+import FeaturesSection from '@/components/homecomp/FeatureSection';
 
 const page = () => {
   return (
     <>
-      <BookingComponent />
+      <BookingApp />
       <FeaturesSection />
     </>
   );

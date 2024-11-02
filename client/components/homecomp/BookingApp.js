@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { auth } from '@/components/firebase/firebaseconfig';
@@ -5,131 +6,13 @@ import axios from 'axios';
 import Link from 'next/link';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import {SearchField} from './SearchField';
+import {Card, CardContent, CardHeader, CardTitle} from './Card';
+import { DateTimeSelector } from './DateTimeSelector';
+import { VehicleList } from './VehicleList';
+import { TripDetails } from './TripDetails';
+import { Map } from './Map';
 
-const Card = ({ children }) => (
-  <div className="bg-white shadow-md rounded-lg p-6">{children}</div>
-);
-
-const CardHeader = ({ children }) => (
-  <div className="mb-4">{children}</div>
-);
-
-const CardTitle = ({ children }) => (
-  <h2 className="text-2xl font-bold mb-2 flex items-center">
-    <i className="fas fa-car mr-4 text-blue-500"></i>
-    {children}
-  </h2>
-);
-
-const CardContent = ({ children }) => <div>{children}</div>;
-
-const SearchField = ({ 
-  icon, 
-  placeholder, 
-  value, 
-  onChange, 
-  suggestions, 
-  onSuggestionClick,
-  isLoading,
-  onClear 
-}) => {
-  const wrapperRef = useRef(null);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setShowSuggestions(false);
-        setIsFocused(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative" ref={wrapperRef}>
-      <div 
-        className={`flex items-center w-full border-2 rounded-lg px-4 py-3 bg-white transition-all duration-200 ${
-          isFocused 
-            ? 'border-blue-500 shadow-md' 
-            : 'border-gray-200 hover:border-gray-300'
-        }`}
-      >
-        <div className="flex items-center flex-1">
-          <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-            icon.includes('green') ? 'bg-green-100' : 'bg-red-100'
-          }`}>
-            <i className={`fas ${icon} text-lg ${
-              icon.includes('green') ? 'text-green-500' : 'text-red-500'
-            }`}></i>
-          </div>
-          <input
-            type="text"
-            placeholder={placeholder}
-            value={value}
-            onChange={(e) => {
-              onChange(e.target.value);
-              setShowSuggestions(true);
-            }}
-            onFocus={() => {
-              setShowSuggestions(true);
-              setIsFocused(true);
-            }}
-            className="w-full ml-3 focus:outline-none text-gray-700 placeholder-gray-400"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          {isLoading && (
-            <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
-          )}
-          {value && (
-            <button
-              onClick={() => {
-                onClear();
-                setShowSuggestions(false);
-              }}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-            >
-              <i className="fas fa-times text-gray-400 hover:text-gray-600"></i>
-            </button>
-          )}
-        </div>
-      </div>
-      {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
-          {suggestions.map((suggestion, index) => (
-            <div
-              key={index}
-              className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-              onClick={() => {
-                onSuggestionClick(suggestion);
-                setShowSuggestions(false);
-                setIsFocused(false);
-              }}
-            >
-              <div className="px-4 py-3 border-b border-gray-100 last:border-b-0">
-                <div className="flex items-center">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100">
-                    <i className="fas fa-map-marker-alt text-gray-500"></i>
-                  </div>
-                  <div className="ml-3">
-                    <div className="font-medium text-gray-900">{suggestion.text}</div>
-                    <div className="text-sm text-gray-500 mt-0.5">
-                      {suggestion.place_name.replace(suggestion.text + ', ', '')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
 
 const BookingApp = () => {
   const [pickupLocation, setPickupLocation] = useState('');
@@ -557,51 +440,6 @@ const BookingApp = () => {
     }
   };
 
-
-  const renderVehiclesList = () => (
-    <div className="mt-4 space-y-4">
-      <h3 className="font-bold text-lg">Available Vehicles:</h3>
-      <div className="grid gap-4">
-        {vehicles.map((vehicle, index) => (
-          <div 
-            key={index}
-            className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-              selectedVehicle === vehicle.name 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-blue-300'
-            }`}
-            onClick={() => setSelectedVehicle(vehicle.name)}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  id={`vehicle-${index}`}
-                  name="vehicle"
-                  value={vehicle.name}
-                  checked={selectedVehicle === vehicle.name}
-                  onChange={(e) => setSelectedVehicle(e.target.value)}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <label 
-                  htmlFor={`vehicle-${index}`}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <i className="fas fa-car text-gray-600"></i>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{vehicle.name}</span>
-                    <span className="text-sm text-gray-500">{vehicle.type}</span>
-                  </div>
-                </label>
-              </div>
-              <span className="font-semibold text-lg">{vehicle.price}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <div className="max-w-7xl mx-auto mt-20">
       <div className="flex flex-col md:flex-row gap-8 my-8">
@@ -643,32 +481,12 @@ const BookingApp = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block font-medium mb-1">Select Date</label>
-                  <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-                    <i className="fas fa-calendar-alt mr-2 text-blue-500"></i>
-                    <input
-                      type="date"
-                      className="w-full border-none focus:outline-none"
-                      value={selectedDate}
-                      onChange={handleDateChange}
-                      min={new Date().toISOString().split("T")[0]}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-medium mb-1">Select Time</label>
-                  <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-                    <i className="fas fa-clock mr-2 text-orange-500"></i>
-                    <input
-                      type="time"
-                      className="w-full border-none focus:outline-none"
-                      value={selectedTime}
-                      onChange={handleTimeChange}
-                    />
-                  </div>
-                </div>
+                <DateTimeSelector
+                  selectedDate={selectedDate}
+                  selectedTime={selectedTime}
+                  onDateChange={handleDateChange}
+                  onTimeChange={handleTimeChange}
+                />
 
                 <button
                   onClick={handleSeePricesClick}
@@ -700,7 +518,13 @@ const BookingApp = () => {
                   </div>
                 )}
 
-                {showPrices && renderVehiclesList()}
+                {showPrices && (
+                  <VehicleList
+                    vehicles={vehicles}
+                    selectedVehicle={selectedVehicle}
+                    onVehicleSelect={setSelectedVehicle}
+                  />
+                )}
                 
                 {selectedVehicle && (
                   <button
@@ -716,25 +540,9 @@ const BookingApp = () => {
           </Card>
         </div>
         <div className="flex-1 mt-8">
-          <div className="w-full h-[500px] rounded-lg overflow-hidden shadow-lg" ref={mapContainer}></div>
-          {distance && duration && (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <div className="flex items-center">
-                        <i className="fas fa-route mr-2 text-blue-500 text-xl"></i>
-                        <span className="font-extrabold text-2xl">Distance:</span>
-                        <span className="ml-2 font-extrabold text-2xl">{distance} km</span>
-                      </div>
-                      <div className="flex items-center ml-5">
-                        <i className="fas fa-clock mr-2 text-blue-500 text-xl"></i>
-                        <span className="font-extrabold text-2xl">Duration:</span>
-                        <span className="ml-2 font-extrabold text-2xl">{duration} mins</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+          <Map mapContainer={mapContainer} />
+          {distance && duration && <TripDetails distance={distance} duration={duration} />}
         </div>
-
       </div>
     </div>
   );

@@ -8,6 +8,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+const allowedOrigins = [
+  "http://localhost:3000"
+];
+
 // Routes
 app.use('/api/auth', authRoutes);
 
