@@ -1,19 +1,7 @@
 import React from 'react';
 import { Clock, Shield, MapPin, CreditCard } from 'lucide-react';
 
-const FeatureCard = ({ icon: Icon, title, description }) => (
-  <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
-    <div className="flex flex-col items-center text-center">
-      <div className="mb-4 p-3 bg-blue-50 rounded-full">
-        <Icon className="w-6 h-6 text-blue-600" />
-      </div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
-    </div>
-  </div>
-);
-
-const FeaturesSection = () => {
+const PassengerFeatures = () => {
   const features = [
     {
       icon: Clock,
@@ -38,22 +26,73 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <div className="bg-gray-50 py-16">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Why Choose RideWise</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+    <div className="py-24 bg-white relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-gradient-to-b from-purple-50 to-white opacity-50" />
+      <div className="absolute -right-40 -top-40 w-80 h-80 bg-purple-100 rounded-full blur-3xl opacity-30" />
+      <div className="absolute -left-40 -bottom-40 w-80 h-80 bg-blue-100 rounded-full blur-3xl opacity-30" />
+
+      <div className="max-w-7xl mx-auto px-4 relative">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Why Passengers Love RideWise
+            </span>
+          </h2>
+          <p className="text-gray-600 text-md max-w-2xl mx-auto">
             Experience the best ride-booking service with features designed to make your journey comfortable and hassle-free.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
-          ))}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <div 
+                key={index}
+                className="group relative bg-white p-8 rounded-3xl transition-all duration-300 hover:shadow-xl border border-gray-100"
+              >
+                <div className="flex items-start space-x-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity" />
+                    <div className="relative w-12 h-12 flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl text-white transform group-hover:scale-110 transition-transform">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold mb-3 text-gray-900 group-hover:text-purple-600 transition-colors">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="mt-16 text-center">
+          <button className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-white rounded-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 transition-transform group-hover:scale-105" />
+            <a className="relative flex items-center" href="#top">
+              Book Your Ride Now
+              <svg 
+                className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </a>
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default FeaturesSection;
+export default PassengerFeatures;

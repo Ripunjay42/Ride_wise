@@ -58,7 +58,7 @@ const Contact = () => {
                     <h2 className="text-2xl font-semibold text-black-600">Get in Touch</h2>
                     <p className="text-gray-700">If you have questions or need assistance, please reach out to us.</p>
                     <ul className="list-disc ml-5 mt-4 text-gray-700">
-                        <li><strong>Email:</strong> support@ridewise.com</li>
+                        <li><strong>Email:</strong> contactridewise@gmail.com</li>
                         <li><strong>Phone:</strong> +91 6003644157</li>
                         <li><strong>Address:</strong> Kanchenjungha Men's Hostel, Tezpur University</li>
                     </ul>
@@ -102,7 +102,7 @@ const Contact = () => {
 
                         <button 
                             type="submit" 
-                            className="w-full mt-4 bg-purple-600 text-white p-2 rounded hover:bg-purple-700 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                            className="w-1/5 mt-4 bg-purple-600 text-white p-2 rounded hover:bg-purple-700 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
                         >
                             Submit
                         </button>

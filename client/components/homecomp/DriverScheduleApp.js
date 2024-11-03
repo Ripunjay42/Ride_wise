@@ -10,6 +10,8 @@ import { SearchField } from './SearchField';
 import { Card, CardContent, CardHeader, CardTitle } from './Card';
 import { Map } from './Map';
 import { TripDetails } from './TripDetails';
+import { PendingVerification } from './PendingVerification';
+import { DriverFeature } from  './DriverFeature';
 
 const DriverScheduleApp = () => {
   const [pickupLocation, setPickupLocation] = useState('');
@@ -21,8 +23,8 @@ const DriverScheduleApp = () => {
   const [isLoadingPickup, setIsLoadingPickup] = useState(false);
   const [isLoadingDropoff, setIsLoadingDropoff] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
-  const [timeFrom, setTimeFrom] = useState('');
-  const [timeTo, setTimeTo] = useState('');
+  const [timeFrom, setTimeFrom] = useState('12:00');
+  const [timeTo, setTimeTo] = useState('12:00');
   const [map, setMap] = useState(null);
   const [pickupMarker, setPickupMarker] = useState(null);
   const [dropoffMarker, setDropoffMarker] = useState(null);
@@ -34,6 +36,7 @@ const DriverScheduleApp = () => {
   const [driverId, setDriverId] = useState(null);
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
+  const [driverStatus, setDriverStatus] = useState(null);
 
   const mapContainer = useRef(null);
 
@@ -81,20 +84,25 @@ const DriverScheduleApp = () => {
           
           setIsDriverAccount(userData.userType === 'driver');
           setIsLoggedIn(userData.userType === 'driver');
+          setDriverStatus(userData.status);
+          console.log('User data:', userData.status);
           
           if (userData.userType === 'driver') {
             setDriverId(userData.driverId);
+            setDriverStatus(userData.status);
           }
         } catch (error) {
           console.error('Error checking user registration:', error);
           setIsLoggedIn(false);
           setIsDriverAccount(false);
           setDriverId(null);
+          setDriverStatus(null);
         }
       } else {
         setIsLoggedIn(false);
         setIsDriverAccount(false);
         setDriverId(null);
+        setDriverStatus(null);
         resetComponent();
       }
     });
@@ -361,6 +369,11 @@ const DriverScheduleApp = () => {
   };
 
   return (
+    <>
+    {isDriverAccount && driverStatus === 'inactive' ? (
+      <PendingVerification />
+    ) : (
+    <>  
     <div className="max-w-7xl mx-auto mt-20">
       <div className="flex flex-col md:flex-row gap-8 my-8">
         <div className="flex-1">
@@ -488,6 +501,10 @@ const DriverScheduleApp = () => {
         </div>
       </div>
     </div>
+    <DriverFeature />
+    </>
+    )}
+    </>
   );
 };
 

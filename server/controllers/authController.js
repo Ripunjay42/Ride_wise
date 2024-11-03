@@ -17,7 +17,7 @@ const signup = async (req, res) => {
         vehicleType,
         gender,
         isAvailable,
-        status: 'active',
+        status: 'inactive',
         licenseValidity,
         rating: 5.0
       });
@@ -76,7 +76,7 @@ const checkUserExistence = async (req, res) => {
     // Check in Driver collection
     const driver = await Driver.findOne({ where: { email } });
     if (driver) {
-      return res.json({ exists: true, userType: 'driver', userName: driver.firstName, driverId: driver.id });
+      return res.json({ exists: true, userType: 'driver', userName: driver.firstName, driverId: driver.id, status: driver.status });
     }
 
     // Check in Passenger collection
