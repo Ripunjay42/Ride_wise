@@ -377,8 +377,8 @@ const DriverScheduleApp = () => {
     <>  
     <div className="max-w-7xl mx-auto mt-24">
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="flex-1 border-[1px] border-black p-3">
-          <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+        <div className="flex-1 border-[1px] border-black bg-white p-3">
+          <div className="bg-gray-200 rounded-xl shadow-xl overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-gray-700 to-gray-900 px-6 py-4">
               <h2 className="flex items-center text-2xl font-bold text-white">
@@ -399,7 +399,7 @@ const DriverScheduleApp = () => {
                   <div className="space-y-3">
                     <div className="relative">
                       <SearchField
-                        icon="text-green-500"
+                        icon="fa-map-marker-alt text-green-500"
                         placeholder="Pickup Location"
                         value={pickupSearch}
                         onChange={setPickupSearch}
@@ -412,7 +412,7 @@ const DriverScheduleApp = () => {
                     </div>
                     <div className="relative">
                       <SearchField
-                        icon="text-red-500"
+                        icon="fa-map-marker-alt text-red-500"
                         placeholder="Dropoff Location"
                         value={dropoffSearch}
                         onChange={setDropoffSearch}

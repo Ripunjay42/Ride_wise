@@ -84,7 +84,7 @@ const Navbar = () => {
             <Link href="/about">
               <button className="px-4 py-2 text-white hover:text-gray-200">About</button>
             </Link>
-            <Link href="/">
+            <Link href="/about">
               <button className="px-4 py-2 text-white hover:text-gray-200">Services</button>
             </Link>
             <Link href="/contact">
@@ -154,13 +154,13 @@ const Navbar = () => {
             <Link href="/help">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Help</button>
             </Link>
-            <Link href="/">
+            <Link href="/about">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">About</button>
             </Link>
-            <Link href="/">
+            <Link href="/about">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Services</button>
             </Link>
-            <Link href="/">
+            <Link href="/contact">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Contact</button>
             </Link>
             

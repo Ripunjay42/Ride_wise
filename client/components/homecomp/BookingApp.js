@@ -485,7 +485,7 @@ const BookingApp = () => {
                       </h3>
                       <div className="space-y-4">
                         <SearchField
-                          icon="text-green-500"
+                          icon="fa-map-marker-alt text-green-500"
                           placeholder="Pickup Location"
                           value={pickupSearch}
                           onChange={setPickupSearch}
@@ -499,7 +499,7 @@ const BookingApp = () => {
                           <div className="absolute left-1/2 -translate-x-1/2 h-6 w-px bg-gray-300"></div>
                         </div>
                         <SearchField
-                          icon="text-red-500"
+                          icon="fa-map-marker-alt text-red-500"
                           placeholder="Dropoff Location"
                           value={dropoffSearch}
                           onChange={setDropoffSearch}
