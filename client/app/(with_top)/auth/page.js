@@ -45,21 +45,21 @@ const AuthFlow = () => {
     licenseValidity: '',
   });
 
-  useEffect(() => {
-    if (auth.currentUser) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-        callback: () => {
-          // reCAPTCHA solved
-        }
-      });
-    }
-    return () => {
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-      }
-    };
-  }, []);
+  // useEffect(() => {
+  //   if (auth.currentUser) {
+  //     window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+  //       size: 'invisible',
+  //       callback: () => {
+  //         // reCAPTCHA solved
+  //       }
+  //     });
+  //   }
+  //   return () => {
+  //     if (window.recaptchaVerifier) {
+  //       window.recaptchaVerifier.clear();
+  //     }
+  //   };
+  // }, []);
 
   const handleEmailSignUp = async (e) => {
     e.preventDefault();
@@ -500,7 +500,7 @@ const AuthFlow = () => {
 
               <div>
                 <label htmlFor="phoneNumber" className="block text-gray-700 mb-1">Phone Number</label>
-                <input id="phoneNumber" type="tel" required value={formData.phoneNumber} onChange={handleChange} className="border border-gray-300 p-2 rounded w-full" />
+                <input id="phoneNumber" type="tel" pattern="[1-9]{1}[0-9]{9}" required value={formData.phoneNumber} onChange={handleChange} className="border border-gray-300 p-2 rounded w-full" />
               </div>
 
               <div>
@@ -527,9 +527,9 @@ const AuthFlow = () => {
                     <label htmlFor="vehicleType" className="block text-gray-700 mb-1">Vehicle Type</label>
                     <select id="vehicleType" required value={formData.vehicleType} onChange={handleChange} className="border border-gray-300 p-2 rounded w-full">
                       <option value="">Select vehicle type</option>
-                      <option value="vehicleType1">Vehicle Type 1</option>
-                      <option value="vehicleType2">Vehicle Type 2</option>
-                      <option value="vehicleType3">Vehicle Type 3</option>
+                      <option value="Sedan">Sedan</option>
+                      <option value="Suv">Suv</option>
+                      <option value="Luxury">Luxury</option>
                     </select>
                   </div>
                   <div>

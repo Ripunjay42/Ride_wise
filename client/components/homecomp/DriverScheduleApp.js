@@ -12,6 +12,7 @@ import { Map } from './Map';
 import { TripDetails } from './TripDetails';
 import { PendingVerification } from './PendingVerification';
 import { DriverFeature } from  './DriverFeature';
+import { Calendar, Clock, MapPin, CalendarPlus } from 'lucide-react';
 
 const DriverScheduleApp = () => {
   const [pickupLocation, setPickupLocation] = useState('');
@@ -374,80 +375,91 @@ const DriverScheduleApp = () => {
       <PendingVerification />
     ) : (
     <>  
-    <div className="max-w-7xl mx-auto mt-20">
-      <div className="flex flex-col md:flex-row gap-8 my-8">
-        <div className="flex-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>ADD SCHEDULE</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="mb-4">
-                    <label className="font-semibold text-lg">
-                      <i className="fas fa-map-marker-alt mr-3 text-black text-3xl"></i>
-                      Set Route
-                    </label>
-                  </div>
-                  <div className="space-y-2">
-                  <SearchField
-                      icon="fa-map-marker-alt text-green-500"
-                      placeholder="Enter pickup location"
-                      value={pickupSearch}
-                      onChange={setPickupSearch}
-                      suggestions={pickupSuggestions}
-                      onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, true)}
-                      isLoading={isLoadingPickup}
-                      onClear={clearPickupLocation}
-                    />
-                    <SearchField
-                      icon="fa-map-marker-alt text-red-500"
-                      placeholder="Enter dropoff location"
-                      value={dropoffSearch}
-                      onChange={setDropoffSearch}
-                      suggestions={dropoffSuggestions}
-                      onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, false)}
-                      isLoading={isLoadingDropoff}
-                      onClear={clearDropoffLocation}
-                    />
+    <div className="max-w-7xl mx-auto mt-24">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex-1 border-[1px] border-black p-3">
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-gray-700 to-gray-900 px-6 py-4">
+              <h2 className="flex items-center text-2xl font-bold text-white">
+                <CalendarPlus className="mr-2 h-6 w-6" />
+                Schedule Your Route
+              </h2>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Route Section */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
+                    <MapPin className="mr-2 h-5 w-5 text-blue-600" />
+                    Route Details
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <SearchField
+                        icon="text-green-500"
+                        placeholder="Pickup Location"
+                        value={pickupSearch}
+                        onChange={setPickupSearch}
+                        suggestions={pickupSuggestions}
+                        onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, true)}
+                        isLoading={isLoadingPickup}
+                        onClear={clearPickupLocation}
+                        className="bg-white shadow-sm"
+                      />
+                    </div>
+                    <div className="relative">
+                      <SearchField
+                        icon="text-red-500"
+                        placeholder="Dropoff Location"
+                        value={dropoffSearch}
+                        onChange={setDropoffSearch}
+                        suggestions={dropoffSuggestions}
+                        onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, false)}
+                        isLoading={isLoadingDropoff}
+                        onClear={clearDropoffLocation}
+                        className="bg-white shadow-sm"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                  <label className="block font-medium mb-1">Select Date</label>
-                  <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-                    <i className="fas fa-calendar-alt mr-2 text-blue-500"></i>
-                    <input
-                      type="date"
-                      className="w-full border-none focus:outline-none"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      min={new Date().toISOString().split("T")[0]}
-                    />
-                  </div>
-                </div>
-                  <div className="grid grid-cols-2 gap-4">
+                {/* Time Section */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
+                    <Clock className="mr-2 h-5 w-5 text-blue-600" />
+                    Time Details
+                  </h3>
+                  <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Available From</label>
-                      <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-                        <i className="fas fa-clock mr-2 text-orange-500"></i>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                      <div className="relative">
+                        <input
+                          type="date"
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          min={new Date().toISOString().split("T")[0]}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Available From</label>
                         <input
                           type="time"
-                          className="w-full border-none focus:outline-none"
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           value={timeFrom}
                           onChange={(e) => setTimeFrom(e.target.value)}
                         />
                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Available To</label>
-                      <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
-                        <i className="fas fa-clock mr-2 text-orange-500"></i>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Available To</label>
                         <input
                           type="time"
-                          className="w-full border-none focus:outline-none"
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           value={timeTo}
                           onChange={(e) => setTimeTo(e.target.value)}
                         />
@@ -456,48 +468,65 @@ const DriverScheduleApp = () => {
                   </div>
                 </div>
 
+                {/* Submit Button */}
                 <button
                   onClick={handleAddSchedule}
-                  className="w-full group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-medium rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:from-green-600 hover:to-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   disabled={!pickupLocation || !dropoffLocation || !selectedDate || !timeFrom || !timeTo}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  <div className="absolute inset-0 w-3 bg-gradient-to-r from-white to-transparent opacity-10 transform -skew-x-12 group-hover:animate-shine"></div>
-                  <i className="fas fa-calendar-plus mr-2 group-hover:animate-wiggle"></i>
-                  <span className="tracking-wide">Add Schedule</span>
+                  <div className="flex items-center justify-center">
+                    <CalendarPlus className="mr-2 h-5 w-5" />
+                    <span>Schedule Route</span>
+                  </div>
                 </button>
 
+                {/* Messages */}
                 {showLoginMessage && (
-                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-red-600 mb-2">
-                      Please log in as a driver to add schedules.
-                    </p>
-                    <Link 
-                      href="/auth" 
-                      className="text-blue-600 hover:text-blue-800 underline"
-                    >
-                      Login here
-                    </Link>
+                  <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
+                    <div className="flex">
+                      <div className="flex-1">
+                        <p className="text-amber-700 font-medium">Please log in as a driver to add schedules</p>
+                        <Link 
+                          href="/auth" 
+                          className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center mt-2"
+                        >
+                          Login here →
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {submitStatus && (
-                  <div className={`mt-4 p-4 ${
+                  <div className={`rounded-lg p-4 ${
                     submitStatus.includes('successfully') 
-                      ? 'bg-green-50 border border-green-300' 
-                      : 'bg-red-50 border border-red-300'
-                  } rounded-md`}>
-                    <p className={submitStatus.includes('successfully') ? 'text-green-500 text-2xl' : 'text-red-600 text-2xl'}>
+                      ? 'bg-green-50 border-l-4 border-green-500' 
+                      : 'bg-red-50 border-l-4 border-red-500'
+                  }`}>
+                    <p className={`${
+                      submitStatus.includes('successfully') ? 'text-green-700' : 'text-red-700'
+                    } font-medium`}>
                       {submitStatus}
                     </p>
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
-        <div className="flex-1 mt-8">
-          <Map mapContainer={mapContainer} />
-          {distance && duration && <TripDetails distance={distance} duration={duration} />}
+
+        {/* Map Section */}
+        <div className="flex-1">
+          <div className="sticky top-8">
+            <div className="bg-white rounded-lg p-3 shadow-xl border-[1px] border-black overflow-hidden">
+              <Map mapContainer={mapContainer} className="h-[400px] w-full" />
+            </div>
+            {distance && duration && (
+                <div className="p-4 border-t">
+                  <TripDetails distance={distance} duration={duration} />
+                </div>
+              )}
+          </div>
         </div>
       </div>
     </div>

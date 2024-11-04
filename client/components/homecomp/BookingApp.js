@@ -12,6 +12,7 @@ import { DateTimeSelector } from './DateTimeSelector';
 import { VehicleList } from './VehicleList';
 import { TripDetails } from './TripDetails';
 import { Map } from './Map';
+import { MapPin, Clock, Tag, CheckCircle, Calendar, Navigation } from 'lucide-react';
 
 
 const BookingApp = () => {
@@ -449,114 +450,184 @@ const BookingApp = () => {
   const handleBookClick = () => {
     if (selectedVehicle) {
       alert(`You have booked ${selectedVehicle}!`);
+      resetComponent();
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-20">
-      <div className="flex flex-col md:flex-row gap-8 my-8">
-        <div className="flex-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>BOOK A RIDE</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="mb-4">
-                    <label className="font-semibold text-lg">
-                      <i className="fas fa-map-marker-alt mr-3 text-black text-3xl"></i>
-                      Search Locations
-                    </label>
-                  </div>
-                  <div className="space-y-2">
-                    <SearchField
-                      icon="fa-map-marker-alt text-green-500"
-                      placeholder="Enter pickup location"
-                      value={pickupSearch}
-                      onChange={setPickupSearch}
-                      suggestions={pickupSuggestions}
-                      onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, true)}
-                      isLoading={isLoadingPickup}
-                      onClear={clearPickupLocation}
-                    />
-                    <SearchField
-                      icon="fa-map-marker-alt text-red-500"
-                      placeholder="Enter dropoff location"
-                      value={dropoffSearch}
-                      onChange={setDropoffSearch}
-                      suggestions={dropoffSuggestions}
-                      onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, false)}
-                      isLoading={isLoadingDropoff}
-                      onClear={clearDropoffLocation}
-                    />
+        <div className="max-w-7xl mx-auto mt-24 px-4">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Booking Form */}
+            <div className="flex-1">
+              <div className="bg-white border-[1px] border-black rounded-lg overflow-hidden">
+                {/* Header */}
+                <div className="relative bg-white border-b-2 border-gray-100 px-6 py-8">
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-50 to-amber-50"></div>
+                  <div className="relative flex items-center justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-800">Book Your Journey</h2>
+                      <p className="text-gray-600 mt-1">Find the perfect ride for your trip</p>
+                    </div>
+                    <div className="h-16 w-16 bg-orange-100 rounded-full flex items-center justify-center">
+                      <Navigation className="h-8 w-8 text-orange-600" />
+                    </div>
                   </div>
                 </div>
-
-                <DateTimeSelector
-                  selectedDate={selectedDate}
-                  selectedTime={selectedTime}
-                  onDateChange={handleDateChange}
-                  onTimeChange={handleTimeChange}
-                />
-
-                <button
-                  onClick={handleSeePricesClick}
-                  className="w-full group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:from-blue-600 hover:to-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  disabled={!pickupLocation || !dropoffLocation || !selectedDate || !selectedTime}
-                >
-                  <div className="absolute inset-0 w-3 bg-gradient-to-r from-white to-transparent opacity-10 transform -skew-x-12 group-hover:animate-shine"></div>
-                  <i className="fas fa-tag mr-2 group-hover:animate-wiggle"></i>
-                  <span className="tracking-wide">See Prices</span>
-                </button>
-
-                {showLoginMessage && (
-                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-red-600 mb-2">
-                      Please log in as a passenger to see prices and book a ride.
-                    </p>
-                    <Link 
-                      href="/auth" 
-                      className="text-blue-600 hover:text-blue-800 underline"
+    
+                {/* Content */}
+                <div className="p-6">
+                  <div className="space-y-6">
+                    {/* Location Section */}
+                    <div className="border-2 border-gray-100 rounded-lg p-6 hover:border-orange-200 transition-colors duration-300">
+                      <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-4">
+                        <MapPin className="mr-2 h-5 w-5 text-orange-500" />
+                        Select Locations
+                      </h3>
+                      <div className="space-y-4">
+                        <SearchField
+                          icon="text-green-500"
+                          placeholder="Pickup Location"
+                          value={pickupSearch}
+                          onChange={setPickupSearch}
+                          suggestions={pickupSuggestions}
+                          onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, true)}
+                          isLoading={isLoadingPickup}
+                          onClear={clearPickupLocation}
+                          className="bg-gray-50 focus:bg-white transition-colors duration-300"
+                        />
+                        <div className="relative">
+                          <div className="absolute left-1/2 -translate-x-1/2 h-6 w-px bg-gray-300"></div>
+                        </div>
+                        <SearchField
+                          icon="text-red-500"
+                          placeholder="Dropoff Location"
+                          value={dropoffSearch}
+                          onChange={setDropoffSearch}
+                          suggestions={dropoffSuggestions}
+                          onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, false)}
+                          isLoading={isLoadingDropoff}
+                          onClear={clearDropoffLocation}
+                          className="bg-gray-50 focus:bg-white transition-colors duration-300"
+                        />
+                      </div>
+                    </div>
+    
+                    {/* Schedule Section */}
+                    <div className="border-2 border-gray-100 rounded-lg p-6 hover:border-orange-200 transition-colors duration-300">
+                      <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-4">
+                        <Calendar className="mr-2 h-5 w-5 text-orange-500" />
+                        Schedule Your Ride
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                          <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={handleDateChange}
+                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                            min={new Date().toISOString().split("T")[0]}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
+                          <input
+                            type="time"
+                            value={selectedTime}
+                            onChange={handleTimeChange}
+                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                          />
+                        </div>
+                      </div>
+                    </div>
+    
+                    {/* Price Button */}
+                    <button
+                      onClick={handleSeePricesClick}
+                      disabled={!pickupLocation || !dropoffLocation || !selectedDate || !selectedTime}
+                      className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Login here
-                    </Link>
+                      <div className="flex items-center justify-center space-x-2">
+                        <Tag className="h-5 w-5" />
+                        <span>Check Available Vehicles</span>
+                      </div>
+                    </button>
+    
+                    {/* Messages */}
+                    {showLoginMessage && (
+                      <div className="border-2 border-orange-200 bg-orange-50 rounded-lg p-6">
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-1">
+                            <p className="text-orange-800 font-medium mb-2">
+                              Please log in as a passenger to proceed
+                            </p>
+                            <Link 
+                              href="/auth" 
+                              className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium"
+                            >
+                              Sign in to your account <span className="ml-2">→</span>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+    
+                    {allfmsg && !allfields && (
+                      <div className="border-2 border-red-200 bg-red-50 rounded-lg p-6">
+                        <p className="text-red-800 font-medium">
+                          All fields are required to proceed
+                        </p>
+                      </div>
+                    )}
+    
+                    {/* Vehicle Selection */}
+                    {showPrices && (
+                      <div className="border-2 border-gray-100 rounded-lg p-6 hover:border-orange-200 transition-colors duration-300">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Vehicle Type</h3>
+                        <VehicleList
+                          vehicles={vehicles}
+                          selectedVehicle={selectedVehicle}
+                          onVehicleSelect={setSelectedVehicle}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Book Button */}
+                    {selectedVehicle && (
+                      <button
+                        onClick={handleBookClick}
+                        className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:from-green-600 hover:to-emerald-700"
+                      >
+                        <div className="flex items-center justify-center space-x-2">
+                          <CheckCircle className="h-5 w-5" />
+                          <span>Confirm {selectedVehicle}</span>
+                        </div>
+                      </button>
+                    )}
                   </div>
-                )}
-
-                {allfmsg && !allfields && (
-                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-red-600 mb-2">Please fill all the required fields.</p>
-                  </div>
-                )}
-
-                {showPrices && (
-                  <VehicleList
-                    vehicles={vehicles}
-                    selectedVehicle={selectedVehicle}
-                    onVehicleSelect={setSelectedVehicle}
-                  />
-                )}
-                
-                {selectedVehicle && (
-                  <button
-                    onClick={handleBookClick}
-                    className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors duration-200"
-                  >
-                    <i className="fas fa-check-circle"></i>
-                    <span>Book {selectedVehicle}</span>
-                  </button>
-                )}
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+    
+            {/* Map and Trip Details Section */}
+            <div className="flex-1">
+              <div className="sticky top-8">
+                {/* Map Container */}
+                <div className="border-[1px] border-black rounded-lg p-3 bg-white hover:border-orange-200 transition-colors duration-300">
+                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                    <Map mapContainer={mapContainer} className="h-[400px] w-full" />
+                  </div>
+                </div>
+                {distance && duration && (
+                      <div className="p-4 border-t">
+                        <TripDetails distance={distance} duration={duration} />
+                      </div>
+                    )}
+    
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex-1 mt-8">
-          <Map mapContainer={mapContainer} />
-          {distance && duration && <TripDetails distance={distance} duration={duration} />}
-        </div>
-      </div>
-    </div>
   );
 };
 

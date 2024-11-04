@@ -1,4 +1,4 @@
-const { Driver, Passenger } = require('../models'); // Import models
+const { Driver, Passenger, Admin } = require('../models'); // Import models
 
 // Function to handle user signup
 const signup = async (req, res) => {
@@ -95,5 +95,36 @@ const checkUserExistence = async (req, res) => {
 
 
 
+// Login endpoint
+const login = async (req, res) => {
+  const { admin_name, password } = req.body;
 
-module.exports = { signup, checkUserExistence };
+  try {
+    // Find admin by admin_name
+    const admin = await Admin.findOne({
+      where: { admin_name }
+    });
+
+    if (!admin || password !== admin.password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      admin: {
+        admin_id: admin.admin_id,
+        admin_name: admin.admin_name
+      }
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
+    return res.status(500).json({ error: 'An error occurred during login' });
+  }
+};
+
+module.exports = { login };
+
+
+
+
+module.exports = { signup, checkUserExistence, login };
