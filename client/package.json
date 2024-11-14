@@ -15,6 +15,8 @@
     "@googlemaps/js-api-loader": "^1.16.8",
     "@mapbox/mapbox-gl-geocoder": "^5.0.3",
     "@mapbox/mapbox-sdk": "^0.16.1",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
     "@react-google-maps/api": "^2.20.3",
     "@react-leaflet/core": "^2.1.0",
     "@shadcn/ui": "^0.0.4",
@@ -22,7 +24,10 @@
     "@turf/turf": "^7.1.0",
     "@types/js-cookie": "^3.0.6",
     "axios": "^1.7.7",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "firebase": "^11.0.1",
+    "framer-motion": "^11.11.17",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
@@ -34,7 +39,9 @@
     "react-dom": "^18",
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.27.0",
-    "sweetalert2": "^11.14.4"
+    "sweetalert2": "^11.14.4",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "autoprefixer": "^10.0.1",

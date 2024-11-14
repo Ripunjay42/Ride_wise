@@ -13,6 +13,7 @@ import { TripDetails } from './TripDetails';
 import { PendingVerification } from './PendingVerification';
 import { DriverFeature } from  './DriverFeature';
 import { Calendar, Clock, MapPin, CalendarPlus } from 'lucide-react';
+import DriverSchedules from './DriverSchedules';
 
 const DriverScheduleApp = () => {
   const [pickupLocation, setPickupLocation] = useState('');
@@ -375,7 +376,7 @@ const DriverScheduleApp = () => {
       <PendingVerification />
     ) : (
     <>  
-    <div className="max-w-7xl mx-auto mt-24">
+    <div className="max-w-7xl mx-auto mt-24 px-4">
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1 border-[1px] border-black bg-white p-3">
           <div className="bg-gray-200 rounded-xl shadow-xl overflow-hidden">
@@ -518,7 +519,7 @@ const DriverScheduleApp = () => {
         {/* Map Section */}
         <div className="flex-1">
           <div className="sticky top-8">
-            <div className="bg-white rounded-lg p-3 shadow-xl border-[1px] border-black overflow-hidden">
+            <div className="bg-white rounded-lg shadow-xl border-[1px] border-black p-3 overflow-hidden">
               <Map mapContainer={mapContainer} className="h-[400px] w-full" />
             </div>
             {distance && duration && (
@@ -530,6 +531,7 @@ const DriverScheduleApp = () => {
         </div>
       </div>
     </div>
+    <DriverSchedules driverId={driverId} />
     <DriverFeature />
     </>
     )}

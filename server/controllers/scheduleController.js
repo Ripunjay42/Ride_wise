@@ -114,6 +114,65 @@ const addSchedule = async (req, res) => {
   }
 };
 
+const getDriverSchedules = async (req, res) => {
+  try {
+    const { driverId } = req.params;
+
+    const schedules = await Schedule.findAll({
+      where: {
+        driverId,
+      },
+      order: [
+        ['date', 'DESC'],
+        ['timeFrom', 'DESC']
+      ]
+    });
+
+    res.status(200).json(schedules);
+  } catch (error) {
+    console.error('Error fetching schedules:', error);
+    res.status(500).json({
+      error: 'Internal server error while fetching schedules',
+      details: error.message
+    });
+  }
+};
+
+const cancelSchedule = async (req, res) => {
+  try {
+    const { scheduleId } = req.params;
+
+    const schedule = await Schedule.findByPk(scheduleId);
+
+    if (!schedule) {
+      return res.status(404).json({
+        error: 'Schedule not found'
+      });
+    }
+
+    if (schedule.status !== 'active') {
+      return res.status(400).json({
+        error: 'Only active schedules can be cancelled'
+      });
+    }
+
+    await schedule.update({ status: 'cancelled' });
+
+    res.status(200).json({
+      message: 'Schedule cancelled successfully',
+      schedule
+    });
+  } catch (error) {
+    console.error('Error cancelling schedule:', error);
+    res.status(500).json({
+      error: 'Internal server error while cancelling schedule',
+      details: error.message
+    });
+  }
+};
+
 module.exports = {
-  addSchedule
+  addSchedule,
+  getDriverSchedules,
+  cancelSchedule
 };

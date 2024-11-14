@@ -16,6 +16,7 @@ const Navbar = () => {
   const [userEmail, setUserEmail] = useState('');
   const [userType, setUserType] = useState('');
   const [userName, setUserName] = useState('');
+  const [profilePic, setProfilePic] = useState('');
 
   // Listen to auth state changes and check registration status
   useEffect(() => {
@@ -31,6 +32,7 @@ const Navbar = () => {
             setUserEmail(user.email);
             setUserType(response.data.userType || '');
             setUserName(response.data.userName || '');
+            setProfilePic(user.photoURL || '');
           } else {
             setIsLoggedIn(false);
             setUserEmail('');
@@ -78,19 +80,17 @@ const Navbar = () => {
 
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* Other navigation links */}
             <Link href="/help">
               <button className="px-4 py-2 text-white hover:text-gray-200">Help</button>
             </Link>
             <Link href="/about">
               <button className="px-4 py-2 text-white hover:text-gray-200">About</button>
             </Link>
-            <Link href="/about">
-              <button className="px-4 py-2 text-white hover:text-gray-200">Services</button>
-            </Link>
             <Link href="/contact">
               <button className="px-4 py-2 text-white hover:text-gray-200">Contact</button>
             </Link>
-            
+
             {!isLoggedIn || !isRegistrationComplete ? (
               <>
                 <Link href="/auth">
@@ -108,7 +108,15 @@ const Navbar = () => {
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center space-x-2 text-white hover:text-gray-200 focus:outline-none"
                 >
-                  <UserCircle className="h-8 w-8" />
+                  {profilePic ? (
+                    <img
+                      src={profilePic}
+                      alt="Profile"
+                      className="h-8 w-8 rounded-full"
+                    />
+                  ) : (
+                    <UserCircle className="h-8 w-8" />
+                  )}
                 </button>
 
                 {/* Profile dropdown menu */}
@@ -151,19 +159,17 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 bg-black">
+            {/* Mobile navigation links */}
             <Link href="/help">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Help</button>
             </Link>
             <Link href="/about">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">About</button>
             </Link>
-            <Link href="/about">
-              <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Services</button>
-            </Link>
             <Link href="/contact">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Contact</button>
             </Link>
-            
+
             {!isLoggedIn || !isRegistrationComplete ? (
               <>
                 <Link href="/auth">
