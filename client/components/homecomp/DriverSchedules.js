@@ -222,7 +222,7 @@ const DriverSchedules = ({ driverId }) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed inset-y-0 right-0 w-full md:w-2/3 lg:w-1/2 bg-gray-50 shadow-2xl z-50"
+            className="fixed inset-y-0 right-0 w-full md:w-2/3 lg:max-w-3xl bg-slate-200 border-[1px] border-black shadow-2xl z-50"
           >
             <div className="h-full flex flex-col">
               <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-4 flex justify-between items-center">

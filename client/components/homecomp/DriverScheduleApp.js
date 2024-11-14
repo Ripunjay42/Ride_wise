@@ -39,6 +39,9 @@ const DriverScheduleApp = () => {
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
   const [driverStatus, setDriverStatus] = useState(null);
+  const [isScheduleSuccess, setIsScheduleSuccess] = useState(false);
+  const [scheduleSuccessMessage, setScheduleSuccessMessage] = useState('');
+
 
   const mapContainer = useRef(null);
 
@@ -330,6 +333,8 @@ const DriverScheduleApp = () => {
         const response = await axios.post('http://localhost:3001/api/schedules', scheduleData);
         
         if (response.status === 201) {
+          setIsScheduleSuccess(true);
+          setScheduleSuccessMessage('Your schedule has been added successfully!');
           setSubmitStatus('Schedule added successfully!');
           resetComponent();
         } else {
@@ -337,7 +342,7 @@ const DriverScheduleApp = () => {
         }
       } catch (error) {
         console.error('Error adding schedule:', error);
-        setSubmitStatus('Error adding schedule. Please try again.');
+        setSubmitStatus(error.response?.data?.error || 'Failed to add schedule. Please try again.');
       }
 
       setTimeout(() => {
@@ -370,12 +375,40 @@ const DriverScheduleApp = () => {
     initializeMap();
   };
 
+  const SuccessPopup = ({ message, onClose }) => {
+    return (
+      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-800">
+        <div className="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-4">
+          <div className="text-green-500">
+            <i className="fas fa-check-circle text-4xl" />
+          </div>
+          <div className="text-green-700">
+            <p className="font-semibold">{message}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="ml-4 text-gray-600 hover:text-gray-800 font-semibold"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
+
   return (
     <>
     {isDriverAccount && driverStatus === 'inactive' ? (
       <PendingVerification />
     ) : (
     <>  
+     {isScheduleSuccess && (
+      <SuccessPopup 
+        message={scheduleSuccessMessage} 
+        onClose={() => setIsScheduleSuccess(false)} 
+      />
+    )}
     <div className="max-w-7xl mx-auto mt-24 px-4">
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1 border-[1px] border-black bg-white p-3">
