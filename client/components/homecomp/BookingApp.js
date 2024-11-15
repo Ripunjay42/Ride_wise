@@ -40,6 +40,9 @@ const BookingApp = () => {
   const [allfmsg, setAllfmsg] = useState(false);
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [noVehiclesMessage, setNoVehiclesMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const mapContainer = useRef(null);
 
@@ -405,7 +408,7 @@ const BookingApp = () => {
     setSelectedVehicle('')
   };
 
-  const handleSeePricesClick = () => {
+  const handleSeePricesClick = async () => {
     if (!isLoggedIn || !isRegistrationComplete) {
       setShowLoginMessage(true);
       setShowPrices(false);
@@ -415,31 +418,43 @@ const BookingApp = () => {
       }, 3000);
       return;
     }
-
+  
     if (pickupLocation && dropoffLocation && selectedDate && selectedTime) {
-      setShowPrices(true);
-      setAllfields(true);
-      setShowLoginMessage(false);
-      setAllfmsg(false);
-
-      // Calculate prices for each vehicle based on distance
-      if (distance) {
-        const availableVehicles = [];
-        Object.entries(vehicleTypes).forEach(([type, details]) => {
-          details.vehicles.forEach(vehicleName => {
-            const price = Math.round(distance * details.baseRate);
-            availableVehicles.push({
-              type: type,
-              name: vehicleName,
-              price: `₹${price}`
-            });
-          });
+      try {
+        setIsLoading(true);
+        const response = await axios.post('http://localhost:3001/api/booking/check-availability', {
+          pickupLocation,
+          dropoffLocation,
+          date: selectedDate,
+          time: selectedTime,
+          distance: parseFloat(distance)
         });
-        setVehicles(availableVehicles);
+  
+        if (response.data.success) {
+          setVehicles(response.data.vehicles);
+          setShowPrices(true);
+          setAllfields(true);
+          setShowLoginMessage(false);
+          setAllfmsg(false);
+          setNoVehiclesMessage(false);
+        } else {
+          setShowPrices(false);
+          setNoVehiclesMessage(true);
+          setTimeout(() => {
+            setNoVehiclesMessage(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error('Error checking vehicle availability:', error);
+        setShowPrices(false);
+        setNoVehiclesMessage(true);
+        setTimeout(() => {
+          setNoVehiclesMessage(false);
+        }, 3000);
+      } finally {
+        setIsLoading(false);
       }
-    }
-
-    if (!allfields) {
+    } else {
       setAllfmsg(true);
       setTimeout(() => {
         setAllfmsg(false);
@@ -553,7 +568,7 @@ const BookingApp = () => {
                       </div>
                     </button>
     
-                    {/* Messages */}
+                    {/* Messages Section */}
                     {showLoginMessage && (
                       <div className="border-2 border-orange-200 bg-orange-50 rounded-lg p-6">
                         <div className="flex items-start space-x-3">
@@ -571,12 +586,40 @@ const BookingApp = () => {
                         </div>
                       </div>
                     )}
-    
+
                     {allfmsg && !allfields && (
                       <div className="border-2 border-red-200 bg-red-50 rounded-lg p-6">
                         <p className="text-red-800 font-medium">
                           All fields are required to proceed
                         </p>
+                      </div>
+                    )}
+
+                    {noVehiclesMessage && (
+                      <div className="border-2 border-yellow-200 bg-yellow-50 rounded-lg p-6 mb-4">
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0">
+                            <span className="inline-block h-6 w-6 text-yellow-600">
+                              <i className="fas fa-exclamation-circle"></i>
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-yellow-800 font-medium">
+                              No vehicles available for the selected route and time. Please try different options.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isLoading && (
+                      <div className="border-2 border-blue-200 bg-blue-50 rounded-lg p-6 mb-4">
+                        <div className="flex items-center justify-center space-x-2">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                          <p className="text-blue-800 font-medium">
+                            Checking available vehicles...
+                          </p>
+                        </div>
                       </div>
                     )}
     

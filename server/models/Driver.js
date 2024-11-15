@@ -1,4 +1,6 @@
+// models/driver.js
 const { DataTypes } = require('sequelize');
+
 module.exports = (sequelize) => {
   const Driver = sequelize.define('Driver', {
     id: {
@@ -56,17 +58,19 @@ module.exports = (sequelize) => {
     rating: {
       type: DataTypes.DECIMAL(3, 2),
       defaultValue: 0.00
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     }
   }, {
-    timestamps: true
+    timestamps: true,
+    tableName: 'Drivers'  // Explicitly specify table name
   });
+
+  Driver.associate = (models) => {
+    Driver.hasMany(models.Schedule, {
+      foreignKey: 'driverId',
+      as: 'schedules',
+      onDelete: 'CASCADE'
+    });
+  };
+
   return Driver;
 };

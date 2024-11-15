@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: 'Drivers',
+        model: 'Drivers',  // Make sure this matches the table name
         key: 'id'
       }
     },
@@ -40,19 +40,12 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(20),
       defaultValue: 'active',
       validate: {
-        isIn: [['active', 'completed', 'cancelled']]
+        isIn: [['active', 'busy', 'completed', 'cancelled']]
       }
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     }
   }, {
     timestamps: true,
+    tableName: 'Schedules',  // Explicitly specify table name
     indexes: [
       {
         fields: ['driverId', 'date'],
@@ -64,7 +57,8 @@ module.exports = (sequelize) => {
   Schedule.associate = (models) => {
     Schedule.belongsTo(models.Driver, {
       foreignKey: 'driverId',
-      as: 'driver'
+      as: 'driver',
+      onDelete: 'CASCADE'
     });
   };
 
