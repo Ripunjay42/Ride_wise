@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from './Card';
+import { Card, CardContent, CardHeader } from '../Card';
 import { Shield, Clock, CheckCircle, Mail, RefreshCcw } from 'lucide-react';
 
 export const PendingVerification = () => {

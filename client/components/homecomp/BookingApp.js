@@ -6,12 +6,12 @@ import axios from 'axios';
 import Link from 'next/link';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import {SearchField} from './SearchField';
-import {Card, CardContent, CardHeader, CardTitle} from './Card';
+import {SearchField} from '../SearchField';
+import {Card, CardContent, CardHeader, CardTitle} from '../Card';
 import { DateTimeSelector } from './DateTimeSelector';
 import { VehicleList } from './VehicleList';
 import { TripDetails } from './TripDetails';
-import { Map } from './Map';
+import { Map } from '../Map';
 import { MapPin, Clock, Tag, CheckCircle, Calendar, Navigation } from 'lucide-react';
 
 
@@ -43,6 +43,7 @@ const BookingApp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [noVehiclesMessage, setNoVehiclesMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const mapContainer = useRef(null);
 
@@ -437,6 +438,7 @@ const BookingApp = () => {
           setShowLoginMessage(false);
           setAllfmsg(false);
           setNoVehiclesMessage(false);
+          setIsPanelOpen(true); // Open the panel when vehicles are loaded
         } else {
           setShowPrices(false);
           setNoVehiclesMessage(true);
@@ -625,18 +627,18 @@ const BookingApp = () => {
     
                     {/* Vehicle Selection */}
                     {showPrices && (
-                      <div className="border-2 border-gray-100 rounded-lg p-6 hover:border-orange-200 transition-colors duration-300">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Vehicle Type</h3>
                         <VehicleList
-                          vehicles={vehicles}
-                          selectedVehicle={selectedVehicle}
-                          onVehicleSelect={setSelectedVehicle}
-                        />
-                      </div>
-                    )}
+                        vehicles={vehicles}
+                        selectedVehicle={selectedVehicle}
+                        onVehicleSelect={setSelectedVehicle}
+                        isOpen={isPanelOpen}
+                        onClose={() => setIsPanelOpen(false)}
+                        onConfirm={handleBookClick}
+                      />
+                      )}
                     
                     {/* Book Button */}
-                    {selectedVehicle && (
+                    {/* {selectedVehicle && (
                       <button
                         onClick={handleBookClick}
                         className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:from-green-600 hover:to-emerald-700"
@@ -646,7 +648,7 @@ const BookingApp = () => {
                           <span>Confirm {selectedVehicle}</span>
                         </div>
                       </button>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>
