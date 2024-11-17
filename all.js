@@ -1,54 +1,38 @@
-const { DataTypes } = require('sequelize');
+// models/admin.js
+const { Model, DataTypes } = require('sequelize');
+
 module.exports = (sequelize) => {
-  const Passenger = sequelize.define('Passenger', {
-    id: {
+  class Admin extends Model {}
+
+  Admin.init({
+    admin_id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
+      defaultValue: DataTypes.UUIDV4, // Use Sequelize's UUIDV4 for UUID generation
+      primaryKey: true,
+      allowNull: false,
     },
-    email: {
+    admin_name: {
       type: DataTypes.STRING,
-      unique: true,
-      allowNull: false
+      allowNull: false,
     },
-    firstName: {
+    password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    phoneNumber: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    gender: {
-      type: DataTypes.STRING(20),
-      allowNull: false
-    },
-    status: {
-      type: DataTypes.STRING(20),
-      defaultValue: 'active'
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    }
   }, {
-    timestamps: true
+    sequelize,
+    modelName: 'Admin',
+    tableName: 'Admin', // This makes sure the table name is exactly "Admin"
+    timestamps: false, // Set to true if you want createdAt/updatedAt fields
   });
-  return Passenger;
+
+  return Admin;
 };
 
 
-
-
+// models/driver.js
 const { DataTypes } = require('sequelize');
+
 module.exports = (sequelize) => {
   const Driver = sequelize.define('Driver', {
     id: {
@@ -106,6 +90,57 @@ module.exports = (sequelize) => {
     rating: {
       type: DataTypes.DECIMAL(3, 2),
       defaultValue: 0.00
+    }
+  }, {
+    timestamps: true,
+    tableName: 'Drivers'  // Explicitly specify table name
+  });
+
+  Driver.associate = (models) => {
+    Driver.hasMany(models.Schedule, {
+      foreignKey: 'driverId',
+      as: 'schedules',
+      onDelete: 'CASCADE'
+    });
+  };
+
+  return Driver;
+};
+
+
+//model passenger.js
+const { DataTypes } = require('sequelize');
+module.exports = (sequelize) => {
+  const Passenger = sequelize.define('Passenger', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true
+    },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    gender: {
+      type: DataTypes.STRING(20),
+      allowNull: false
+    },
+    status: {
+      type: DataTypes.STRING(20),
+      defaultValue: 'active'
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -118,8 +153,9 @@ module.exports = (sequelize) => {
   }, {
     timestamps: true
   });
-  return Driver;
+  return Passenger;
 };
+
 
 // models/schedule.js
 const { DataTypes } = require('sequelize');
@@ -135,7 +171,7 @@ module.exports = (sequelize) => {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: 'Drivers',
+        model: 'Drivers',  // Make sure this matches the table name
         key: 'id'
       }
     },
@@ -163,19 +199,12 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(20),
       defaultValue: 'active',
       validate: {
-        isIn: [['active', 'completed', 'cancelled']]
+        isIn: [['active', 'busy', 'completed', 'cancelled']]
       }
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     }
   }, {
     timestamps: true,
+    tableName: 'Schedules',  // Explicitly specify table name
     indexes: [
       {
         fields: ['driverId', 'date'],
@@ -187,44 +216,89 @@ module.exports = (sequelize) => {
   Schedule.associate = (models) => {
     Schedule.belongsTo(models.Driver, {
       foreignKey: 'driverId',
-      as: 'driver'
+      as: 'driver',
+      onDelete: 'CASCADE'
     });
   };
 
   return Schedule;
 };
 
-// models/admin.js
-const { Model, DataTypes } = require('sequelize');
+
+//model pnr.js
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  class Admin extends Model {}
+  const PNR = sequelize.define(
+    'PNR',
+    {
+      PNRid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+      },
+      passengerId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: 'Passengers', // Adjust based on actual table name
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+      },
+      driverId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: 'Drivers', // Adjust based on actual table name
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+      },
+      locationFrom: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      locationTo: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+      },
+      time: {
+        type: DataTypes.TIME,
+        allowNull: false,
+      },
+      distance: {
+        type: DataTypes.DECIMAL(5, 2),
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.DECIMAL(8, 2),
+        allowNull: false,
+      },
+      status: {
+        type: DataTypes.ENUM('active', 'complete', 'cancelled'),
+        defaultValue: 'active',
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+    },
+    {
+      tableName: 'PNR',
+      timestamps: true,
+      updatedAt: 'updatedAt',
+      createdAt: 'createdAt',
+    }
+  );
 
-  Admin.init({
-    admin_id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4, // Use Sequelize's UUIDV4 for UUID generation
-      primaryKey: true,
-      allowNull: false,
-    },
-    admin_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  }, {
-    sequelize,
-    modelName: 'Admin',
-    tableName: 'Admin', // This makes sure the table name is exactly "Admin"
-    timestamps: false, // Set to true if you want createdAt/updatedAt fields
-  });
-
-  return Admin;
+  return PNR;
 };
-
-
-
-

@@ -81,14 +81,20 @@ const Navbar = () => {
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-4">
             {/* Other navigation links */}
+            <Link href="/">
+              <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Ride</button>
+            </Link>
+            <Link href="/dashboard">
+              <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Drive</button>
+            </Link>
             <Link href="/help">
-              <button className="px-4 py-2 text-white hover:text-gray-200">Help</button>
+              <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Help</button>
             </Link>
             <Link href="/about">
-              <button className="px-4 py-2 text-white hover:text-gray-200">About</button>
+              <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">About</button>
             </Link>
             <Link href="/contact">
-              <button className="px-4 py-2 text-white hover:text-gray-200">Contact</button>
+              <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Contact</button>
             </Link>
 
             {!isLoggedIn || !isRegistrationComplete ? (
@@ -160,6 +166,12 @@ const Navbar = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 bg-black">
             {/* Mobile navigation links */}
+            <Link href="/">
+              <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Ride</button>
+            </Link>
+            <Link href="/dashboard">
+              <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Drive</button>
+            </Link>
             <Link href="/help">
               <button className="block px-4 py-2 text-white hover:bg-gray-900 rounded">Help</button>
             </Link>

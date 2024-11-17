@@ -44,6 +44,7 @@ const BookingApp = () => {
   const [noVehiclesMessage, setNoVehiclesMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [passengerId, setPassengerId] = useState('');
 
   const mapContainer = useRef(null);
 
@@ -192,11 +193,11 @@ const BookingApp = () => {
     }
   };
 
-  const vehicleTypes = {
-    'Sedan': { baseRate: 10, vehicles: ['Toyota Camry', 'Honda Civic'] },
-    'SUV': { baseRate: 20, vehicles: ['Toyota Fortuner', 'Ford Endeavour'] },
-    'Luxury': { baseRate: 30, vehicles: ['Mercedes Benz', 'BMW 5 Series'] }
-  };
+  // const vehicleTypes = {
+  //   'Sedan': { baseRate: 10, vehicles: ['Toyota Camry', 'Honda Civic'] },
+  //   'SUV': { baseRate: 20, vehicles: ['Toyota Fortuner', 'Ford Endeavour'] },
+  //   'Luxury': { baseRate: 30, vehicles: ['Mercedes Benz', 'BMW 5 Series'] }
+  // };
 
   const handleSuggestionClick = async (suggestion, isPickup = true) => {
     const [lng, lat] = suggestion.center;
@@ -316,6 +317,9 @@ const BookingApp = () => {
           const response = await axios.get(`http://localhost:3001/api/auth/user/${user.email}`);
           setIsRegistrationComplete(response.data.userType === 'passenger');
           setIsLoggedIn(response.data.userType === 'passenger');
+          if (response.data.userType === 'passenger') {
+            setPassengerId(response.data.passengerId);
+          }
         } catch (error) {
           console.error('Error checking user registration:', error);
           setIsLoggedIn(false);
@@ -433,6 +437,7 @@ const BookingApp = () => {
   
         if (response.data.success) {
           setVehicles(response.data.vehicles);
+          console.log('Vehicles:', response.data.vehicles);
           setShowPrices(true);
           setAllfields(true);
           setShowLoginMessage(false);
@@ -628,13 +633,18 @@ const BookingApp = () => {
                     {/* Vehicle Selection */}
                     {showPrices && (
                         <VehicleList
-                        vehicles={vehicles}
-                        selectedVehicle={selectedVehicle}
-                        onVehicleSelect={setSelectedVehicle}
-                        isOpen={isPanelOpen}
-                        onClose={() => setIsPanelOpen(false)}
-                        onConfirm={handleBookClick}
-                      />
+                          vehicles={vehicles}
+                          selectedVehicle={selectedVehicle}
+                          setSelectedVehicle={setSelectedVehicle}
+                          isOpen={isPanelOpen}
+                          onClose={() => setIsPanelOpen(false)}
+                          passengerId={passengerId}
+                          pickupLocation={pickupLocation}
+                          dropoffLocation={dropoffLocation}
+                          selectedDate={selectedDate}
+                          selectedTime={selectedTime}
+                          distance={distance}
+                        />
                       )}
                     
                     {/* Book Button */}

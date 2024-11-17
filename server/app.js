@@ -5,6 +5,10 @@ const { sequelize } = require('./models');
 const authRoutes = require('./routes/authRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+
+// Add this with your other route configurations
+
 
 const app = express();
 app.use(cors());
@@ -18,6 +22,7 @@ const allowedOrigins = [
 app.use('/api/auth', authRoutes);
 app.use('/api', scheduleRoutes);
 app.use(adminRoutes);
+app.use('/api/booking', bookingRoutes);
 
 
 // Sync database and start the server
