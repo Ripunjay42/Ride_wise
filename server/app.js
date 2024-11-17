@@ -11,12 +11,11 @@ const bookingRoutes = require('./routes/bookingRoutes');
 
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
-const allowedOrigins = [
-  "http://localhost:3000"
-];
+app.use(bodyParser.json());
+app.use(cors({
+  origin: 'http://localhost:3000', // Adjust based on your frontend URL
+}));
 
 // Routes
 app.use('/api/auth', authRoutes);

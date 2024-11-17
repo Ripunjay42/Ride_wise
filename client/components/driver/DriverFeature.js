@@ -7,7 +7,7 @@ export const DriverFeature = () => {
       icon: <MapPin className="w-8 h-8" />,
       title: "Flexible Routes",
       description: "Set your own pickup and drop-off locations that suit your daily commute",
-      color: "from-blue-500 to-blue-600"
+      color: "from-black to-black"
     },
     {
       icon: <Clock className="w-8 h-8" />,
@@ -19,7 +19,7 @@ export const DriverFeature = () => {
       icon: <DollarSign className="w-8 h-8" />,
       title: "Extra Income",
       description: "Earn money by sharing your ride with passengers going your way",
-      color: "from-purple-500 to-purple-600"
+      color: "from-gray-900 to-gray-900"
     },
     {
       icon: <Shield className="w-8 h-8" />,
@@ -57,7 +57,7 @@ export const DriverFeature = () => {
     <div className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+          <h2 className="text-3xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-black to-gray-900 text-transparent bg-clip-text">
             Why Choose RideWise?
           </h2>
           <p className="text-gray-600 text-md max-w-2xl mx-auto">
@@ -71,8 +71,8 @@ export const DriverFeature = () => {
               key={index}
               className="relative group"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
-              <div className="relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 h-full border border-gray-100">
+              <div className="absolute inset-0 bg-gradient-to-r from-black to-gray-900 rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+              <div className="relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 h-full border border-gray-600">
                 <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} p-3 mb-8 text-white transform group-hover:scale-110 transition-transform duration-300`}>
                   {feature.icon}
                 </div>
@@ -90,10 +90,10 @@ export const DriverFeature = () => {
         {/* Bottom CTA Section */}
         <div className="mt-20 text-center">
           <div className="relative inline-block">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg blur-lg opacity-50 animate-pulse"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black to-gray-900 rounded-lg blur-lg opacity-50 animate-pulse"></div>
             <a 
               href="#top"
-              className="relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+              className="relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-black to-gray-900 text-white font-semibold rounded-lg hover:from-black hover:to-gray-900 transition-all duration-300 transform hover:scale-105"
             >
               <Calendar className="w-5 h-5 mr-2" />
               Start Scheduling Your Rides

@@ -18,7 +18,7 @@ const SuccessPage = () => {
     const fetchBookingDetails = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`http://localhost:3001/api/booking/${pnr}`);
+        const response = await axios.get(`http://localhost:3001/api/booking/pnr/${pnr}`);
         setBookingDetails(response.data.booking);
       } catch (error) {
         console.error('Error fetching booking details:', error);

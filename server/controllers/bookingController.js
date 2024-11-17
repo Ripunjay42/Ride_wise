@@ -156,7 +156,56 @@ const getBookingDetails = async (req, res) => {
     }
   };
 
+  const getPassengerBookings = async (req, res) => {
+    try {
+      const { passengerId } = req.params;
+      console.log(passengerId);
+  
+      const bookings = await PNR.findAll({
+        where: { passengerId },
+        include: [
+          {
+            model: Driver,
+            as: 'driver',
+            attributes: ['firstName', 'lastName', 'vehicleNumber', 'vehicleType', 'phoneNumber']
+          }
+        ],
+        order: [['createdAt', 'DESC']]
+      });
+  
+      const formattedBookings = bookings.map(booking => ({
+        pnr: booking.PNRid,
+        locationFrom: booking.locationFrom,
+        locationTo: booking.locationTo,
+        date: booking.date,
+        time: booking.time,
+        distance: booking.distance,
+        price: booking.price,
+        status: booking.status,
+        driver: booking.driver ? {
+          name: `${booking.driver.firstName} ${booking.driver.lastName}`,
+          vehicleNumber: booking.driver.vehicleNumber,
+          vehicleType: booking.driver.vehicleType,
+          phoneNumber: booking.driver.phoneNumber
+        } : null
+      }));
+  
+      res.status(200).json({
+        success: true,
+        bookings: formattedBookings
+      });
+  
+    } catch (error) {
+      console.error('Error fetching passenger bookings:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error while fetching bookings'
+      });
+    }
+  };
+  
 module.exports = {
   createBooking,
-  getBookingDetails
+  getBookingDetails,
+  getPassengerBookings
 };

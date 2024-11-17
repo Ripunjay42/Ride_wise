@@ -28,14 +28,14 @@ const PassengerFeatures = () => {
   return (
     <div className="py-24 bg-white relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-50 to-white opacity-50" />
-      <div className="absolute -right-40 -top-40 w-80 h-80 bg-purple-100 rounded-full blur-3xl opacity-30" />
-      <div className="absolute -left-40 -bottom-40 w-80 h-80 bg-blue-100 rounded-full blur-3xl opacity-30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-blackto-white opacity-50" />
+      <div className="absolute -right-40 -top-40 w-80 h-80 bg-white rounded-full blur-3xl opacity-30" />
+      <div className="absolute -left-40 -bottom-40 w-80 h-80 bg-white rounded-full blur-3xl opacity-30" />
 
       <div className="max-w-7xl mx-auto px-4 relative">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-gray-800 to-gray-950 bg-clip-text text-transparent">
               Why Passengers Love RideWise
             </span>
           </h2>
@@ -50,17 +50,17 @@ const PassengerFeatures = () => {
             return (
               <div 
                 key={index}
-                className="group relative bg-white p-8 rounded-3xl transition-all duration-300 hover:shadow-xl border border-gray-100"
+                className="group relative bg-white p-8 rounded-3xl transition-all duration-300 hover:shadow-xl border border-gray-500"
               >
                 <div className="flex items-start space-x-6">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity" />
-                    <div className="relative w-12 h-12 flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl text-white transform group-hover:scale-110 transition-transform">
+                    <div className="absolute inset-0 bg-gradient-to-br from-black to-gray-900 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity" />
+                    <div className="relative w-12 h-12 flex items-center justify-center bg-gradient-to-br from-black to-gray-900 rounded-2xl text-white transform group-hover:scale-110 transition-transform">
                       <Icon className="w-5 h-5" />
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold mb-3 text-gray-900 group-hover:text-purple-600 transition-colors">
+                    <h3 className="text-xl font-semibold mb-3 text-gray-900 group-hover:text-black transition-colors">
                       {feature.title}
                     </h3>
                     <p className="text-gray-600 leading-relaxed">
@@ -76,7 +76,7 @@ const PassengerFeatures = () => {
         {/* Bottom CTA */}
         <div className="mt-16 text-center">
           <button className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-white rounded-full overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 transition-transform group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black to-gray-900 transition-transform group-hover:scale-105" />
             <a className="relative flex items-center" href="#top">
               Book Your Ride Now
               <svg 

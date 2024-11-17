@@ -6,6 +6,9 @@ const bookingController = require('../controllers/bookingController');
 router.post('/create', bookingController.createBooking);
 
 // Get booking details by PNR
-router.get('/:pnr', bookingController.getBookingDetails);
+router.get('/pnr/:pnr', bookingController.getBookingDetails);
+
+// Fix: Changed from '/passenger/passengerId' to '/passenger/:passengerId'
+router.get('/passenger/:passengerId', bookingController.getPassengerBookings);
 
 module.exports = router;

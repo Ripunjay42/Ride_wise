@@ -12,6 +12,7 @@ import { DateTimeSelector } from './DateTimeSelector';
 import { VehicleList } from './VehicleList';
 import { TripDetails } from './TripDetails';
 import { Map } from '../Map';
+import  BookingStatusPanel  from './BookingStatusPanel';
 import { MapPin, Clock, Tag, CheckCircle, Calendar, Navigation } from 'lucide-react';
 
 
@@ -45,6 +46,7 @@ const BookingApp = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [passengerId, setPassengerId] = useState('');
+  const [isStatusPanelOpen, setIsStatusPanelOpen] = useState(false);
 
   const mapContainer = useRef(null);
 
@@ -477,212 +479,213 @@ const BookingApp = () => {
   };
 
   return (
-        <div className="max-w-7xl mx-auto mt-24 px-4">
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Booking Form */}
-            <div className="flex-1">
-              <div className="bg-white border-[1px] border-black rounded-lg overflow-hidden">
-                {/* Header */}
-                <div className="relative bg-white border-b-2 border-gray-100 px-6 py-8">
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-50 to-amber-50"></div>
-                  <div className="relative flex items-center justify-between">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-800">Book Your Journey</h2>
-                      <p className="text-gray-600 mt-1">Find the perfect ride for your trip</p>
-                    </div>
-                    <div className="h-16 w-16 bg-orange-100 rounded-full flex items-center justify-center">
-                      <Navigation className="h-8 w-8 text-orange-600" />
-                    </div>
-                  </div>
+    <div className="max-w-[1500px] mx-auto mt-24 px-4">
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Booking Form - now 1/3 width */}
+        <div className="w-full lg:w-[650px]">
+          <div className="bg-white border-[1px] border-black overflow-hidden">
+            {/* Header */}
+            <div className="relative bg-white border-b-2 border-gray-100 px-6 py-8">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-50 to-amber-50"></div>
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Book Your Journey</h2>
+                  <p className="text-gray-600 mt-1">Find the perfect ride for your trip</p>
                 </div>
-    
-                {/* Content */}
-                <div className="p-6">
-                  <div className="space-y-6">
-                    {/* Location Section */}
-                    <div className="border-2 border-gray-100 rounded-lg p-6 hover:border-orange-200 transition-colors duration-300">
-                      <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-4">
-                        <MapPin className="mr-2 h-5 w-5 text-orange-500" />
-                        Select Locations
-                      </h3>
-                      <div className="space-y-4">
-                        <SearchField
-                          icon="fa-map-marker-alt text-green-500"
-                          placeholder="Pickup Location"
-                          value={pickupSearch}
-                          onChange={setPickupSearch}
-                          suggestions={pickupSuggestions}
-                          onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, true)}
-                          isLoading={isLoadingPickup}
-                          onClear={clearPickupLocation}
-                          className="bg-gray-50 focus:bg-white transition-colors duration-300"
-                        />
-                        <div className="relative">
-                          <div className="absolute left-1/2 -translate-x-1/2 h-6 w-px bg-gray-300"></div>
-                        </div>
-                        <SearchField
-                          icon="fa-map-marker-alt text-red-500"
-                          placeholder="Dropoff Location"
-                          value={dropoffSearch}
-                          onChange={setDropoffSearch}
-                          suggestions={dropoffSuggestions}
-                          onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, false)}
-                          isLoading={isLoadingDropoff}
-                          onClear={clearDropoffLocation}
-                          className="bg-gray-50 focus:bg-white transition-colors duration-300"
-                        />
-                      </div>
-                    </div>
-    
-                    {/* Schedule Section */}
-                    <div className="border-2 border-gray-100 rounded-lg p-6 hover:border-orange-200 transition-colors duration-300">
-                      <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-4">
-                        <Calendar className="mr-2 h-5 w-5 text-orange-500" />
-                        Schedule Your Ride
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                          <input
-                            type="date"
-                            value={selectedDate}
-                            onChange={handleDateChange}
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
-                            min={new Date().toISOString().split("T")[0]}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
-                          <input
-                            type="time"
-                            value={selectedTime}
-                            onChange={handleTimeChange}
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
-                          />
-                        </div>
-                      </div>
-                    </div>
-    
-                    {/* Price Button */}
+                <div className="flex items-center gap-4">
+                  {isLoggedIn && (
                     <button
-                      onClick={handleSeePricesClick}
-                      disabled={!pickupLocation || !dropoffLocation || !selectedDate || !selectedTime}
-                      className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setIsStatusPanelOpen(true)}
+                      className="px-4 py-2 bg-white border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-50 transition-colors duration-200 flex items-center gap-2"
                     >
-                      <div className="flex items-center justify-center space-x-2">
-                        <Tag className="h-5 w-5" />
-                        <span>Check Available Vehicles</span>
-                      </div>
+                      <Clock className="h-5 w-5" />
+                      View Booking Status
                     </button>
-    
-                    {/* Messages Section */}
-                    {showLoginMessage && (
-                      <div className="border-2 border-orange-200 bg-orange-50 rounded-lg p-6">
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-1">
-                            <p className="text-orange-800 font-medium mb-2">
-                              Please log in as a passenger to proceed
-                            </p>
-                            <Link 
-                              href="/auth" 
-                              className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium"
-                            >
-                              Sign in to your account <span className="ml-2">→</span>
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {allfmsg && !allfields && (
-                      <div className="border-2 border-red-200 bg-red-50 rounded-lg p-6">
-                        <p className="text-red-800 font-medium">
-                          All fields are required to proceed
-                        </p>
-                      </div>
-                    )}
-
-                    {noVehiclesMessage && (
-                      <div className="border-2 border-yellow-200 bg-yellow-50 rounded-lg p-6 mb-4">
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0">
-                            <span className="inline-block h-6 w-6 text-yellow-600">
-                              <i className="fas fa-exclamation-circle"></i>
-                            </span>
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-yellow-800 font-medium">
-                              No vehicles available for the selected route and time. Please try different options.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {isLoading && (
-                      <div className="border-2 border-blue-200 bg-blue-50 rounded-lg p-6 mb-4">
-                        <div className="flex items-center justify-center space-x-2">
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                          <p className="text-blue-800 font-medium">
-                            Checking available vehicles...
-                          </p>
-                        </div>
-                      </div>
-                    )}
-    
-                    {/* Vehicle Selection */}
-                    {showPrices && (
-                        <VehicleList
-                          vehicles={vehicles}
-                          selectedVehicle={selectedVehicle}
-                          setSelectedVehicle={setSelectedVehicle}
-                          isOpen={isPanelOpen}
-                          onClose={() => setIsPanelOpen(false)}
-                          passengerId={passengerId}
-                          pickupLocation={pickupLocation}
-                          dropoffLocation={dropoffLocation}
-                          selectedDate={selectedDate}
-                          selectedTime={selectedTime}
-                          distance={distance}
-                        />
-                      )}
-                    
-                    {/* Book Button */}
-                    {/* {selectedVehicle && (
-                      <button
-                        onClick={handleBookClick}
-                        className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:from-green-600 hover:to-emerald-700"
-                      >
-                        <div className="flex items-center justify-center space-x-2">
-                          <CheckCircle className="h-5 w-5" />
-                          <span>Confirm {selectedVehicle}</span>
-                        </div>
-                      </button>
-                    )} */}
+                  )}
+                  <div className="h-16 w-16 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Navigation className="h-8 w-8 text-orange-600" />
                   </div>
                 </div>
               </div>
             </div>
-    
-            {/* Map and Trip Details Section */}
-            <div className="flex-1">
-              <div className="sticky top-8">
-                {/* Map Container */}
-                <div className="border-[1px] border-black rounded-lg p-3 bg-white hover:border-orange-200 transition-colors duration-300">
-                  <div className="bg-gray-50 rounded-lg overflow-hidden">
-                    <Map mapContainer={mapContainer} className="h-[400px] w-full" />
+  
+            {/* Content */}
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Location Section */}
+                <div className="border-2 border-gray-100 rounded-lg p-6 hover:border-orange-200 transition-colors duration-300">
+                  <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-4">
+                    <MapPin className="mr-2 h-5 w-5 text-orange-500" />
+                    Select Locations
+                  </h3>
+                  <div className="space-y-4">
+                    <SearchField
+                      icon="fa-map-marker-alt text-green-500"
+                      placeholder="Pickup Location"
+                      value={pickupSearch}
+                      onChange={setPickupSearch}
+                      suggestions={pickupSuggestions}
+                      onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, true)}
+                      isLoading={isLoadingPickup}
+                      onClear={clearPickupLocation}
+                      className="bg-gray-50 focus:bg-white transition-colors duration-300"
+                    />
+                    <div className="relative">
+                      <div className="absolute left-1/2 -translate-x-1/2 h-6 w-px bg-gray-300"></div>
+                    </div>
+                    <SearchField
+                      icon="fa-map-marker-alt text-red-500"
+                      placeholder="Dropoff Location"
+                      value={dropoffSearch}
+                      onChange={setDropoffSearch}
+                      suggestions={dropoffSuggestions}
+                      onSuggestionClick={(suggestion) => handleSuggestionClick(suggestion, false)}
+                      isLoading={isLoadingDropoff}
+                      onClear={clearDropoffLocation}
+                      className="bg-gray-50 focus:bg-white transition-colors duration-300"
+                    />
                   </div>
                 </div>
-                {distance && duration && (
-                      <div className="p-4 border-t">
-                        <TripDetails distance={distance} duration={duration} />
+  
+                {/* Schedule Section */}
+                <div className="border-2 border-gray-100 rounded-lg p-6 hover:border-orange-200 transition-colors duration-300">
+                  <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-4">
+                    <Calendar className="mr-2 h-5 w-5 text-orange-500" />
+                    Schedule Your Ride
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={handleDateChange}
+                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                        min={new Date().toISOString().split("T")[0]}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
+                      <input
+                        type="time"
+                        value={selectedTime}
+                        onChange={handleTimeChange}
+                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                      />
+                    </div>
+                  </div>
+                </div>
+  
+                {/* Price Button */}
+                <button
+                  onClick={handleSeePricesClick}
+                  disabled={!pickupLocation || !dropoffLocation || !selectedDate || !selectedTime}
+                  className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <Tag className="h-5 w-5" />
+                    <span>Check Available Vehicles</span>
+                  </div>
+                </button>
+  
+                {/* Messages Section */}
+                {showLoginMessage && (
+                  <div className="border-2 border-orange-200 bg-orange-50 rounded-lg p-6">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="text-orange-800 font-medium mb-2">
+                          Please log in as a passenger to proceed
+                        </p>
+                        <Link 
+                          href="/auth" 
+                          className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium"
+                        >
+                          Sign in to your account <span className="ml-2">→</span>
+                        </Link>
                       </div>
-                    )}
-    
+                    </div>
+                  </div>
+                )}
+  
+                {/* Other alert messages */}
+                {allfmsg && !allfields && (
+                  <div className="border-2 border-red-200 bg-red-50 rounded-lg p-6">
+                    <p className="text-red-800 font-medium">
+                      All fields are required to proceed
+                    </p>
+                  </div>
+                )}
+  
+                {noVehiclesMessage && (
+                  <div className="border-2 border-yellow-200 bg-yellow-50 rounded-lg p-6 mb-4">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="text-yellow-800 font-medium">
+                          No vehicles available for the selected route and time. Please try different options.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+  
+                {isLoading && (
+                  <div className="border-2 border-blue-200 bg-blue-50 rounded-lg p-6 mb-4">
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                      <p className="text-blue-800 font-medium">
+                        Checking available vehicles...
+                      </p>
+                    </div>
+                  </div>
+                )}
+  
+                {/* Vehicle Selection */}
+                {showPrices && (
+                  <VehicleList
+                    vehicles={vehicles}
+                    selectedVehicle={selectedVehicle}
+                    setSelectedVehicle={setSelectedVehicle}
+                    isOpen={isPanelOpen}
+                    onClose={() => setIsPanelOpen(false)}
+                    passengerId={passengerId}
+                    pickupLocation={pickupLocation}
+                    dropoffLocation={dropoffLocation}
+                    selectedDate={selectedDate}
+                    selectedTime={selectedTime}
+                    distance={distance}
+                  />
+                )}
               </div>
             </div>
           </div>
         </div>
+  
+        {/* Map and Trip Details Section - now 2/3 width */}
+        <div className="w-full lg:w-[850px]">
+          <div className="sticky top-8">
+            {/* Map Container */}
+            <div className="border-[1px] border-black p-3 bg-white hover:border-orange-200 transition-colors duration-300">
+              <div className="bg-gray-50 rounded-lg overflow-hidden">
+                <Map mapContainer={mapContainer} className="h-[600px] w-full" />
+              </div>
+            </div>
+            {distance && duration && (
+              <div className="">
+                <TripDetails distance={distance} duration={duration} />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {isLoggedIn && (
+        <BookingStatusPanel 
+          isOpen={isStatusPanelOpen}
+          onClose={() => setIsStatusPanelOpen(false)}
+          passengerId={passengerId}
+        />
+      )}
+    </div>
   );
 };
 

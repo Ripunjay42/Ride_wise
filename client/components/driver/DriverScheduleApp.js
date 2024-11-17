@@ -409,9 +409,9 @@ const DriverScheduleApp = () => {
         onClose={() => setIsScheduleSuccess(false)} 
       />
     )}
-    <div className="max-w-7xl mx-auto mt-24 px-4">
+    <div className="max-w-[1500px] mx-auto mt-24 px-4">
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="flex-1 border-[1px] border-black bg-white p-3">
+        <div className="border-[1px] border-black bg-white p-3 w-full lg:w-[650px]">
           <div className="bg-gray-200 rounded-xl shadow-xl overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-gray-700 to-gray-900 px-6 py-4">
@@ -550,13 +550,13 @@ const DriverScheduleApp = () => {
         </div>
 
         {/* Map Section */}
-        <div className="flex-1">
+        <div className="w-full lg:w-[850px]">
           <div className="sticky top-8">
-            <div className="bg-white rounded-lg shadow-xl border-[1px] border-black p-3 overflow-hidden">
-              <Map mapContainer={mapContainer} className="h-[400px] w-full" />
+            <div className="bg-white shadow-xl border-[1px] border-black p-3 overflow-hidden">
+              <Map mapContainer={mapContainer} className="h-[600px] w-full" />
             </div>
             {distance && duration && (
-                <div className="p-4 border-t">
+                <div className="">
                   <TripDetails distance={distance} duration={duration} />
                 </div>
               )}
