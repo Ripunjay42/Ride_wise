@@ -1,96 +1,146 @@
-// utils/emailService.js
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
-const formatTime = (timeString) => {
-  return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true
+// Create a more robust transporter
+const createTransporter = () => {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: false, // Use false for TLS
+    requireTLS: true,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: true
+    }
   });
 };
 
-const generatePassengerEmail = (booking, driver) => ({
-  subject: `Ride Booking Confirmed - PNR: ${booking.PNRid}`,
-  html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #f97316;">Your Ride is Confirmed!</h2>
-      <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="color: #1f2937; margin-bottom: 15px;">Booking Details</h3>
-        <p><strong>PNR Number:</strong> ${booking.PNRid}</p>
-        <p><strong>Date:</strong> ${booking.date}</p>
-        <p><strong>Time:</strong> ${formatTime(booking.time)}</p>
-        <p><strong>From:</strong> ${booking.locationFrom}</p>
-        <p><strong>To:</strong> ${booking.locationTo}</p>
-        <p><strong>Amount Paid:</strong> ₹${booking.price}</p>
-      </div>
+// Generate passenger email content
+const generatePassengerEmail = (pnr, driver) => {
+  const subject = `Booking Confirmation - PNR: ${pnr.PNRid}`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Your Ride is Confirmed!</h2>
+      <p>Dear Passenger,</p>
+      <p>Your booking has been successfully confirmed. Here are your trip details:</p>
       
-      <div style="background-color: #fff7ed; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="color: #1f2937; margin-bottom: 15px;">Driver Details</h3>
-        <p><strong>Driver Name:</strong> ${driver.firstName} ${driver.lastName}</p>
+      <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <p><strong>PNR Number:</strong> ${pnr.PNRid}</p>
+        <p><strong>Date:</strong> ${pnr.date}</p>
+        <p><strong>Time:</strong> ${pnr.time}</p>
+        <p><strong>Pick-up Location:</strong> ${pnr.locationFrom}</p>
+        <p><strong>Drop-off Location:</strong> ${pnr.locationTo}</p>
+        <p><strong>Distance:</strong> ${pnr.distance} km</p>
+        <p><strong>Fare:</strong> $₹{pnr.price}</p>
+      </div>
+
+      <div style="background-color: #e9ecef; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <h3 style="margin-top: 0;">Driver Details</h3>
+        <p><strong>Name:</strong> ${driver.firstName} ${driver.lastName}</p>
         <p><strong>Vehicle Number:</strong> ${driver.vehicleNumber}</p>
         <p><strong>Vehicle Type:</strong> ${driver.vehicleType}</p>
         <p><strong>Contact:</strong> ${driver.phoneNumber}</p>
       </div>
 
-      <div style="color: #6b7280; font-size: 14px; margin-top: 20px;">
-        <p>For any assistance, please contact our support team.</p>
-        <p>Thank you for choosing our service!</p>
-      </div>
+      <p>For any assistance, please contact our support team.</p>
+      <p>Thank you for choosing our service!</p>
     </div>
-  `
-});
+  `;
 
-const generateDriverEmail = (booking, passenger) => ({
-  subject: `New Booking Received - PNR: ${booking.PNRid}`,
-  html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #f97316;">New Ride Booking!</h2>
-      <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="color: #1f2937; margin-bottom: 15px;">Booking Details</h3>
-        <p><strong>PNR Number:</strong> ${booking.PNRid}</p>
-        <p><strong>Date:</strong> ${booking.date}</p>
-        <p><strong>Time:</strong> ${formatTime(booking.time)}</p>
-        <p><strong>Pickup Location:</strong> ${booking.locationFrom}</p>
-        <p><strong>Drop Location:</strong> ${booking.locationTo}</p>
-        <p><strong>Distance:</strong> ${booking.distance} km</p>
-        <p><strong>Fare Amount:</strong> ₹${booking.price}</p>
-      </div>
+  return { subject, html };
+};
+
+// Generate driver email content
+const generateDriverEmail = (pnr, passenger) => {
+  const subject = `New Ride Assignment - PNR: ${pnr.PNRid}`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">New Ride Assignment</h2>
+      <p>Dear Driver,</p>
+      <p>You have a new ride assignment. Here are the trip details:</p>
       
-      <div style="background-color: #fff7ed; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="color: #1f2937; margin-bottom: 15px;">Passenger Details</h3>
-        <p><strong>Passenger Name:</strong> ${passenger.firstName} ${passenger.lastName}</p>
+      <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <p><strong>PNR Number:</strong> ${pnr.PNRid}</p>
+        <p><strong>Date:</strong> ${pnr.date}</p>
+        <p><strong>Time:</strong> ${pnr.time}</p>
+        <p><strong>Pick-up Location:</strong> ${pnr.locationFrom}</p>
+        <p><strong>Drop-off Location:</strong> ${pnr.locationTo}</p>
+        <p><strong>Distance:</strong> ${pnr.distance} km</p>
+      </div>
+
+      <div style="background-color: #e9ecef; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <h3 style="margin-top: 0;">Passenger Details</h3>
+        <p><strong>Name:</strong> ${passenger.firstName} ${passenger.lastName}</p>
         <p><strong>Contact:</strong> ${passenger.phoneNumber}</p>
       </div>
 
-      <div style="color: #6b7280; font-size: 14px; margin-top: 20px;">
-        <p>Please ensure timely pickup and professional service.</p>
-        <p>For any assistance, contact our support team.</p>
-      </div>
+      <p>Please ensure you arrive at the pickup location on time.</p>
+      <p>For any assistance, please contact our support team.</p>
     </div>
-  `
-});
+  `;
 
-const sendEmail = async (to, emailContent) => {
-  try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to,
-      subject: emailContent.subject,
-      html: emailContent.html
-    });
-    return true;
-  } catch (error) {
-    console.error('Email sending failed:', error);
+  return { subject, html };
+};
+
+// Enhanced send email function with comprehensive error handling
+const sendEmail = async (to, { subject, html }, retries = 2) => {
+  // Validate email address
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(to)) {
+    console.error(`Invalid email address: ${to}`);
     return false;
   }
+
+  // Create transporter for each send attempt
+  const transporter = createTransporter();
+
+  for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    try {
+      console.log(`Email sending attempt ${attempt}:`, {
+        to,
+        subject,
+        fromEmail: process.env.SMTP_FROM_EMAIL
+      });
+
+      const mailOptions = {
+        from: process.env.SMTP_FROM_EMAIL,
+        to,
+        subject,
+        html,
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      
+      console.log('Email sent successfully:', {
+        messageId: info.messageId,
+        accepted: info.accepted,
+        rejected: info.rejected
+      });
+
+      return true;
+    } catch (error) {
+      console.error(`Email sending error (Attempt ${attempt}):`, {
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      });
+
+      // If it's the last retry, throw the error
+      if (attempt === retries + 1) {
+        throw error;
+      }
+
+      // Wait a bit before retrying
+      await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+    }
+  }
+
+  return false;
 };
 
 module.exports = {

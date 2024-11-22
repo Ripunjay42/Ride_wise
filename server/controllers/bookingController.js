@@ -3,6 +3,7 @@ const { PNR, Schedule, Driver, Passenger } = require('../models');
 const { v4: uuidv4 } = require('uuid');
 const { sendEmail, generatePassengerEmail, generateDriverEmail } = require('../utils/emailService');
 const { sequelize } = require('../models');
+const logger = require('../utils/logger'); // Assumed logger utility
 
 const createBooking = async (req, res) => {
   // Start transaction
@@ -21,11 +22,22 @@ const createBooking = async (req, res) => {
       price
     } = req.body;
 
-    // Validate required fields
-    if (!scheduleId || !passengerId || !driverId || !locationFrom || !locationTo || !date || !time || !distance || !price) {
+    // Validate required fields with more comprehensive checks
+    const requiredFields = [
+      'scheduleId', 'passengerId', 'driverId', 
+      'locationFrom', 'locationTo', 'date', 
+      'time', 'distance', 'price'
+    ];
+
+    const missingFields = requiredFields.filter(field => 
+      !req.body[field] || 
+      (typeof req.body[field] === 'string' && req.body[field].trim() === '')
+    );
+
+    if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'All fields are required'
+        message: `Missing or empty required fields: ${missingFields.join(', ')}`
       });
     }
 
@@ -61,18 +73,39 @@ const createBooking = async (req, res) => {
       Passenger.findByPk(passengerId)
     ]);
 
-    // Commit transaction
+    // Validate driver and passenger
+    if (!driver || !passenger) {
+      await transaction.rollback();
+      return res.status(404).json({
+        success: false,
+        message: 'Driver or Passenger not found'
+      });
+    }
+
+    // Commit transaction before sending emails
     await transaction.commit();
 
-    // Send confirmation emails
+    // Async email sending with better error handling
     try {
-      await Promise.all([
+      const [passengerEmailSent, driverEmailSent] = await Promise.allSettled([
         sendEmail(passenger.email, generatePassengerEmail(pnr, driver)),
         sendEmail(driver.email, generateDriverEmail(pnr, passenger))
       ]);
+
+      // Log email sending results
+      logger.info('Email Sending Results', {
+        passenger: passengerEmailSent.status,
+        driver: driverEmailSent.status
+      });
+
+      // Optional: You could implement a notification system 
+      // for failed email sends if needed
     } catch (emailError) {
-      console.error('Error sending confirmation emails:', emailError);
-      // Don't fail the booking if emails fail
+      logger.error('Email Sending Error', {
+        error: emailError,
+        pnrId: pnr.PNRid
+      });
+      // Non-blocking email error
     }
 
     res.status(201).json({
@@ -85,7 +118,11 @@ const createBooking = async (req, res) => {
     // Rollback transaction on error
     await transaction.rollback();
     
-    console.error('Error creating booking:', error);
+    logger.error('Booking Creation Error', {
+      message: error.message,
+      stack: error.stack
+    });
+
     res.status(500).json({
       success: false,
       message: 'Internal server error while creating booking',
