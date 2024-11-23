@@ -225,7 +225,8 @@ module.exports = (sequelize) => {
 };
 
 
-//model pnr.js
+// models/pnr.js
+//PNR model (models/pnr.js)
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
@@ -241,7 +242,7 @@ module.exports = (sequelize) => {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-          model: 'Passengers', // Adjust based on actual table name
+          model: 'Passengers',
           key: 'id',
         },
         onDelete: 'CASCADE',
@@ -250,10 +251,19 @@ module.exports = (sequelize) => {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-          model: 'Drivers', // Adjust based on actual table name
+          model: 'Drivers',
           key: 'id',
         },
         onDelete: 'SET NULL',
+      },
+      scheduleId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: 'Schedules',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
       },
       locationFrom: {
         type: DataTypes.TEXT,
@@ -280,8 +290,12 @@ module.exports = (sequelize) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM('active', 'complete', 'cancelled'),
+        type: DataTypes.STRING(20),
+        allowNull: false,
         defaultValue: 'active',
+        validate: {
+          isIn: [['active', 'completed', 'cancelled']]
+        }
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -297,8 +311,44 @@ module.exports = (sequelize) => {
       timestamps: true,
       updatedAt: 'updatedAt',
       createdAt: 'createdAt',
+      indexes: [
+        {
+          fields: ['status'],
+          name: 'pnr_status_idx'
+        },
+        {
+          fields: ['passengerId'],
+          name: 'pnr_passenger_idx'
+        },
+        {
+          fields: ['driverId'],
+          name: 'pnr_driver_idx'
+        },
+        {
+          fields: ['scheduleId'],
+          name: 'pnr_schedule_idx'
+        }
+      ]
     }
   );
+
+  // Updated associations
+  PNR.associate = (models) => {
+    PNR.belongsTo(models.Driver, {
+      foreignKey: 'driverId',
+      as: 'driver',
+    });
+    
+    PNR.belongsTo(models.Passenger, {
+      foreignKey: 'passengerId',
+      as: 'passenger',
+    });
+
+    PNR.belongsTo(models.Schedule, {
+      foreignKey: 'scheduleId',
+      as: 'schedule',
+    });
+  };
 
   return PNR;
 };

@@ -44,6 +44,7 @@ const createBooking = async (req, res) => {
     // Create PNR record
     const pnr = await PNR.create({
       PNRid: uuidv4(),
+      scheduleId,
       passengerId,
       driverId,
       locationFrom,
