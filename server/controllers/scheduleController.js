@@ -1,6 +1,221 @@
 //scheduleController.js
-const { Schedule, Driver } = require('../models'); // Import both Schedule and Driver models
-const { Op } = require('sequelize'); // Import Sequelize operators
+const { PNR, Schedule, Driver, Passenger, sequelize } = require('../models');
+const { sendEmail } = require('../utils/emailService');
+const { Op } = require('sequelize');
+
+// Generate OTP email content
+const generateOtpEmail = (otp, driverName) => {
+  const subject = 'Ride Completion OTP';
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Ride Completion Verification</h2>
+      <p>Dear Passenger,</p>
+      <p>Your driver ${driverName} has initiated the ride completion process.</p>
+      
+      <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <h3 style="margin: 0; color: #333; text-align: center;">Your OTP</h3>
+        <p style="font-size: 32px; font-weight: bold; text-align: center; margin: 10px 0; letter-spacing: 5px;">
+          ${otp}
+        </p>
+        <p style="color: #666; text-align: center; margin: 0;">
+          This OTP will expire in 5 minutes
+        </p>
+      </div>
+
+      <p>Please share this OTP with your driver to complete the ride.</p>
+      <p>If you didn't request this OTP, please contact our support team immediately.</p>
+    </div>
+  `;
+
+  return { subject, html };
+};
+
+const sendOtp = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const { scheduleId } = req.params;
+
+    // Find the schedule with driver details
+    const schedule = await Schedule.findOne({
+      where: { 
+        id: scheduleId,
+        status: 'busy'  // Only allow OTP generation for ongoing rides
+      },
+      include: [{
+        model: Driver,
+        as: 'driver',
+        attributes: ['firstName', 'lastName']
+      }],
+      transaction
+    });
+
+    if (!schedule) {
+      await transaction.rollback();
+      return res.status(404).json({
+        success: false,
+        message: 'No active ride found for this schedule'
+      });
+    }
+
+    // Find the PNR record with passenger details
+    const pnr = await PNR.findOne({
+      where: { 
+        scheduleId,
+        status: 'active'
+      },
+      include: [{
+        model: Passenger,
+        as: 'passenger',
+        attributes: ['email', 'firstName', 'lastName']
+      }],
+      transaction
+    });
+
+    if (!pnr) {
+      await transaction.rollback();
+      return res.status(404).json({
+        success: false,
+        message: 'No active booking found for this schedule'
+      });
+    }
+
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiresAt = new Date(Date.now() + 5 * 60000); // 5 minutes from now
+
+    // Update PNR with OTP details
+    await pnr.update({
+      otp,
+      otpExpiresAt,
+      otpAttempts: 0  // Reset attempts when generating new OTP
+    }, { transaction });
+
+    // Send OTP email
+    const driverName = `${schedule.driver.firstName} ${schedule.driver.lastName}`;
+    const emailContent = generateOtpEmail(otp, driverName);
+    
+    await sendEmail(pnr.passenger.email, emailContent);
+
+    await transaction.commit();
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent successfully to passenger email'
+    });
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error in sendOtp:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send OTP',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+const verifyOtp = async (req, res) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const { scheduleId } = req.params;
+    const { otp, pnrId } = req.body;
+
+    // Validate input
+    if (!otp || !pnrId) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: 'OTP and PNR ID are required'
+      });
+    }
+
+    // Find PNR record
+    const pnr = await PNR.findOne({
+      where: {
+        PNRid: pnrId,
+        scheduleId,
+        status: 'active'
+      },
+      transaction
+    });
+
+    if (!pnr) {
+      await transaction.rollback();
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    // Check if OTP is expired
+    if (new Date() > pnr.otpExpiresAt) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has expired. Please request a new one.'
+      });
+    }
+
+    // Check OTP attempts
+    if (pnr.otpAttempts >= 3) {
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum OTP attempts exceeded. Please request a new OTP.'
+      });
+    }
+
+    // Verify OTP
+    if (pnr.otp !== otp) {
+      await pnr.increment('otpAttempts', { transaction });
+      await transaction.rollback();
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP'
+      });
+    }
+
+    // Update PNR and Schedule status
+    await Promise.all([
+      pnr.update({
+        status: 'completed',
+        otp: null,
+        otpExpiresAt: null,
+        completedAt: new Date()
+      }, { transaction }),
+      
+      Schedule.update(
+        { 
+          status: 'completed',
+          completedAt: new Date()
+        },
+        { 
+          where: { id: scheduleId },
+          transaction
+        }
+      )
+    ]);
+
+    await transaction.commit();
+
+    res.status(200).json({
+      success: true,
+      message: 'Ride completed successfully'
+    });
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error in verifyOtp:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify OTP',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
 
 const addSchedule = async (req, res) => {
   try {
@@ -124,8 +339,9 @@ const getDriverSchedules = async (req, res) => {
         driverId,
       },
       order: [
-        ['date', 'DESC'],
-        ['timeFrom', 'DESC']
+        ['status', 'ASC'],
+        ['date', 'ASC'],
+        ['timeFrom', 'ASC']
       ]
     });
 
@@ -286,9 +502,58 @@ const checkAvailableVehicles = async (req, res) => {
   }
 };
 
+// Add new endpoint to get PNR details by schedule ID
+const getPnrBySchedule = async (req, res) => {
+  try {
+    const { scheduleId } = req.params;
+
+    const pnr = await PNR.findOne({
+      where: { 
+        scheduleId,
+        status: 'active'
+      },
+      include: [
+        {
+          model: Passenger,
+          as: 'passenger',
+          attributes: ['firstName', 'lastName', 'phoneNumber']
+        }
+      ]
+    });
+
+    if (!pnr) {
+      return res.status(404).json({
+        success: false,
+        message: 'No active booking found for this schedule'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      booking: {
+        pnr: pnr.PNRid,
+        passenger: {
+          name: `${pnr.passenger.firstName} ${pnr.passenger.lastName}`,
+          phoneNumber: pnr.passenger.phoneNumber
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching PNR details:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch booking details'
+    });
+  }
+};
+
 module.exports = {
   addSchedule,
   getDriverSchedules,
   cancelSchedule,
-  checkAvailableVehicles
+  checkAvailableVehicles,
+  sendOtp,
+  verifyOtp,
+  getPnrBySchedule
 };

@@ -40,7 +40,7 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
     switch (status) {
       case 'active':
         return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'complete':
+      case 'completed':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'cancelled':
         return 'bg-red-100 text-red-800 border-red-200';
@@ -139,8 +139,8 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
                     Active
                   </FilterButton>
                   <FilterButton
-                    active={filterStatus === 'complete'}
-                    onClick={() => setFilterStatus('complete')}
+                    active={filterStatus === 'completed'}
+                    onClick={() => setFilterStatus('completed')}
                     className="bg-green-100 text-green-800 border-green-200"
                   >
                     Completed

@@ -1,4 +1,3 @@
-//PNR model (models/pnr.js)
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
@@ -66,8 +65,24 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: 'active',
         validate: {
-          isIn: [['active', 'completed', 'cancelled']]
-        }
+          isIn: [['active', 'completed', 'cancelled']],
+        },
+      },
+      otp: {
+        type: DataTypes.STRING(6),
+        allowNull: true,
+      },
+      otpExpiresAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      otpAttempts: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      completedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -86,31 +101,30 @@ module.exports = (sequelize) => {
       indexes: [
         {
           fields: ['status'],
-          name: 'pnr_status_idx'
+          name: 'pnr_status_idx',
         },
         {
           fields: ['passengerId'],
-          name: 'pnr_passenger_idx'
+          name: 'pnr_passenger_idx',
         },
         {
           fields: ['driverId'],
-          name: 'pnr_driver_idx'
+          name: 'pnr_driver_idx',
         },
         {
           fields: ['scheduleId'],
-          name: 'pnr_schedule_idx'
-        }
-      ]
+          name: 'pnr_schedule_idx',
+        },
+      ],
     }
   );
 
-  // Updated associations
   PNR.associate = (models) => {
     PNR.belongsTo(models.Driver, {
       foreignKey: 'driverId',
       as: 'driver',
     });
-    
+
     PNR.belongsTo(models.Passenger, {
       foreignKey: 'passengerId',
       as: 'passenger',
