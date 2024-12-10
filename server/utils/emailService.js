@@ -35,7 +35,7 @@ const generatePassengerEmail = (pnr, driver) => {
         <p><strong>Pick-up Location:</strong> ${pnr.locationFrom}</p>
         <p><strong>Drop-off Location:</strong> ${pnr.locationTo}</p>
         <p><strong>Distance:</strong> ${pnr.distance} km</p>
-        <p><strong>Fare:</strong> $₹{pnr.price}</p>
+        <p><strong>Fare:</strong> ₹${pnr.price}</p>
       </div>
 
       <div style="background-color: #e9ecef; padding: 20px; border-radius: 5px; margin: 20px 0;">
