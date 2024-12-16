@@ -1,4 +1,3 @@
-// models/driver.js
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
@@ -58,6 +57,10 @@ module.exports = (sequelize) => {
     rating: {
       type: DataTypes.DECIMAL(3, 2),
       defaultValue: 0.00
+    },
+    totalRatings: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     }
   }, {
     timestamps: true,

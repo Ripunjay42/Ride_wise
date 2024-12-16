@@ -1,6 +1,6 @@
 //scheduleController.js
 const { PNR, Schedule, Driver, Passenger, sequelize } = require('../models');
-const { sendEmail } = require('../utils/emailService');
+const { sendEmail, generatePassengerEmail, generateDriverEmail, generateRideCompletionPassengerEmail, generateRideCompletionDriverEmail } = require('../utils/emailService');
 const { Op } = require('sequelize');
 
 // Generate OTP email content
@@ -139,6 +139,10 @@ const verifyOtp = async (req, res) => {
         scheduleId,
         status: 'active'
       },
+      include: [
+        { model: Passenger, as: 'passenger' },
+        { model: Driver, as: 'driver' }
+      ],
       transaction
     });
 
@@ -199,11 +203,23 @@ const verifyOtp = async (req, res) => {
       )
     ]);
 
+    // Commit transaction
     await transaction.commit();
+
+    // Send ride completion emails to passenger and driver
+    const passengerCompletionEmailContent = generateRideCompletionPassengerEmail(pnr, pnr.driver);
+    const driverCompletionEmailContent = generateRideCompletionDriverEmail(pnr, pnr.passenger);
+
+    const passengerCompletionEmailSent = await sendEmail(pnr.passenger.email, passengerCompletionEmailContent);
+    const driverCompletionEmailSent = await sendEmail(pnr.driver.email, driverCompletionEmailContent);
+
+    // Log email status
+    console.log('Passenger completion email sent:', passengerCompletionEmailSent);
+    console.log('Driver completion email sent:', driverCompletionEmailSent);
 
     res.status(200).json({
       success: true,
-      message: 'Ride completed successfully'
+      message: 'Ride completed successfully, and emails sent to both passenger and driver'
     });
 
   } catch (error) {

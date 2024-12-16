@@ -242,8 +242,142 @@ const getBookingDetails = async (req, res) => {
     }
   };
   
+  const rateDriver = async (req, res) => {
+    const transaction = await sequelize.transaction();
+  
+    try {
+      const { 
+        vehicleNumber, 
+        pnr, 
+        driverBehavior, 
+        drivingSkill, 
+        vehicleCleanliness, 
+        punctuality, 
+        overallSatisfaction 
+      } = req.body;
+  
+      // Validate inputs
+      const requiredFields = [
+        'vehicleNumber', 'pnr', 
+        'driverBehavior', 'drivingSkill', 
+        'vehicleCleanliness', 'punctuality', 
+        'overallSatisfaction'
+      ];
+  
+      const missingFields = requiredFields.filter(field => 
+        !req.body[field] || 
+        (typeof req.body[field] === 'number' && (req.body[field] < 1 || req.body[field] > 5))
+      );
+  
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid or missing fields: ${missingFields.join(', ')}`
+        });
+      }
+  
+      // Find the driver by vehicle number
+      const driver = await Driver.findOne({ 
+        where: { vehicleNumber } 
+      });
+  
+      if (!driver) {
+        return res.status(404).json({
+          success: false,
+          message: 'Driver not found'
+        });
+      }
+  
+      // Find the PNR to ensure it's a completed booking for this driver
+      const booking = await PNR.findOne({ 
+        where: { 
+          PNRid: pnr, 
+          driverId: driver.id, // Use driver ID from found driver
+          status: 'completed' 
+        } 
+      });
+  
+      if (!booking) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid booking for rating'
+        });
+      }
+  
+      // Calculate average rating
+      const averageRating = (
+        driverBehavior + 
+        drivingSkill + 
+        vehicleCleanliness + 
+        punctuality + 
+        overallSatisfaction
+      ) / 5;
+  
+      // Update driver's rating
+      // New rating is weighted average of existing and new rating
+      const currentRating = driver.rating || 0;
+      const totalRatings = driver.totalRatings || 0;
+  
+      const newTotalRatings = totalRatings + 1;
+      const newOverallRating = ((currentRating * totalRatings) + averageRating) / newTotalRatings;
+  
+      await Driver.update(
+        { 
+          rating: parseFloat(newOverallRating.toFixed(2)),
+          totalRatings: newTotalRatings
+        },
+        { 
+          where: { id: driver.id },
+          transaction
+        }
+      );
+  
+      // Mark booking as rated
+      await PNR.update(
+        { isRated: true },
+        { 
+          where: { PNRid: pnr },
+          transaction
+        }
+      );
+  
+      // Commit transaction
+      await transaction.commit();
+  
+      // Log rating
+      logger.info('Driver Rated', {
+        vehicleNumber,
+        pnr,
+        averageRating,
+        newOverallRating
+      });
+  
+      res.status(200).json({
+        success: true,
+        message: 'Driver rated successfully',
+        newRating: newOverallRating
+      });
+  
+    } catch (error) {
+      // Rollback transaction
+      await transaction.rollback();
+  
+      logger.error('Driver Rating Error', {
+        message: error.message,
+        stack: error.stack
+      });
+  
+      res.status(500).json({
+        success: false,
+        message: 'Error processing driver rating',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  };
+
 module.exports = {
   createBooking,
   getBookingDetails,
-  getPassengerBookings
+  getPassengerBookings,
+  rateDriver
 };

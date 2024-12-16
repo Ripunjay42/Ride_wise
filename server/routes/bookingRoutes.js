@@ -11,4 +11,6 @@ router.get('/pnr/:pnr', bookingController.getBookingDetails);
 // Fix: Changed from '/passenger/passengerId' to '/passenger/:passengerId'
 router.get('/passenger/:passengerId', bookingController.getPassengerBookings);
 
+router.post('/rate', bookingController.rateDriver);
+
 module.exports = router;

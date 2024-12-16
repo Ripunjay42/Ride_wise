@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Calendar, Clock, Car, X, AlertCircle, Search } from 'lucide-react';
 import axios from 'axios';
+import RatingModal from './RatingModal'; 
 
 const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
   const [bookings, setBookings] = useState([]);
@@ -9,6 +10,8 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
   const [error, setError] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [selectedBookingForRating, setSelectedBookingForRating] = useState(null);
 
   useEffect(() => {
     if (isOpen && passengerId) {
@@ -25,6 +28,7 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
       console.log(response.data);
       if (response.data.success) {
         setBookings(response.data.bookings);
+        console.log('Bookings:', response.data.bookings);
       } else {
         setError('Failed to fetch bookings');
       }
@@ -75,7 +79,18 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
       booking.pnr?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const handleRateDriverClick = (vehicleNumber, pnr) => {
+      setSelectedBookingForRating({ vehicleNumber, pnr });
+      setRatingModalOpen(true);
+    };
+  
+    const handleRatingSubmit = () => {
+      // Optionally refresh bookings or update local state
+      fetchBookings();
+    };
+
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50">
@@ -169,6 +184,7 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
                     getStatusColor={getStatusColor}
                     formatDate={formatDate}
                     formatTime={formatTime}
+                    onRateDriver={handleRateDriverClick}
                   />
                 )}
               </div>
@@ -177,6 +193,16 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
         </div>
       )}
     </AnimatePresence>
+
+    {/* Rating Modal */}
+    <RatingModal 
+    isOpen={ratingModalOpen}
+    onClose={() => setRatingModalOpen(false)}
+    vehicleNumber={selectedBookingForRating?.vehicleNumber}
+    pnr={selectedBookingForRating?.pnr}
+    onSubmit={handleRatingSubmit}
+  />
+</>
   );
 };
 
@@ -214,7 +240,13 @@ const EmptyState = ({ searchTerm, filterStatus }) => (
   </div>
 );
 
-const BookingsList = ({ bookings, getStatusColor, formatDate, formatTime }) => (
+const BookingsList = ({ 
+  bookings, 
+  getStatusColor, 
+  formatDate, 
+  formatTime, 
+  onRateDriver 
+}) => (
   <div className="space-y-4">
     {bookings.map((booking) => (
       <div 
@@ -281,6 +313,16 @@ const BookingsList = ({ bookings, getStatusColor, formatDate, formatTime }) => (
             </div>
           )}
         </div>
+        {booking.status === 'completed' && booking.driver && (
+          <div className="p-4 border-t border-gray-100">
+            <button
+              onClick={() => onRateDriver(booking.driver.vehicleNumber, booking.pnr)}
+              className="w-full bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+            >
+              Rate Driver
+            </button>
+          </div>
+        )}
       </div>
     ))}
   </div>
