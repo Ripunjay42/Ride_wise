@@ -73,8 +73,7 @@ const DriverScheduleApp = () => {
   }, [debouncedDropoffSearch]);
 
   useEffect(() => {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic3BpZGVybmlzaGFudGEiLCJhIjoiY20ydW5ubGZuMDNlZTJpc2I1N2o3YWo0aiJ9.tKmf9gr1qgyi_N7WOaPoZw';
-
+    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
     if (mapContainer.current) {
       initializeMap();
     }
