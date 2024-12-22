@@ -2,10 +2,11 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
+    "scripts": {
+      "start": "node index.js",
+      "dev": "nodemon index.js",
+      "vercel-build": "npx sequelize-cli db:migrate"
+    },
   "keywords": [],
   "author": "",
   "license": "ISC",

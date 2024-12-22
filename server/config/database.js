@@ -19,7 +19,19 @@ const config = {
       ssl: {
         require: true,
         rejectUnauthorized: false
-      }
+      },
+      keepAlive: true
+    },
+    retry: {
+      match: [
+        /SequelizeConnectionError/,
+        /SequelizeConnectionRefusedError/,
+        /SequelizeHostNotFoundError/,
+        /SequelizeHostNotReachableError/,
+        /SequelizeInvalidConnectionError/,
+        /SequelizeConnectionTimedOutError/
+      ],
+      max: 3
     }
   },
   production: {
