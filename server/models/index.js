@@ -11,8 +11,12 @@ const db = {};
 
 let sequelize;
 
-// Initialize Sequelize first
 try {
+  // Debugging configurations
+  console.log('Environment:', env);
+  console.log('Database Config:', config);
+
+  // Initialize Sequelize
   if (config.use_env_variable) {
     sequelize = new Sequelize(process.env[config.use_env_variable], config);
   } else {
@@ -23,13 +27,14 @@ try {
       config
     );
   }
+  console.log('Sequelize successfully initialized.');
 } catch (error) {
   console.error('Sequelize initialization error:', error);
-  throw error;
+  throw error; // Exit with error if Sequelize fails to initialize
 }
 
-// Only proceed with model loading if sequelize is initialized
-if (sequelize) {
+try {
+  // Dynamically load models
   fs.readdirSync(__dirname)
     .filter(file => {
       return (
@@ -49,11 +54,16 @@ if (sequelize) {
       }
     });
 
+  // Set up associations
   Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {
       db[modelName].associate(db);
     }
   });
+  console.log('Models successfully loaded.');
+} catch (error) {
+  console.error('Error during model loading or association:', error);
+  throw error;
 }
 
 db.sequelize = sequelize;
