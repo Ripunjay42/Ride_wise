@@ -17,8 +17,8 @@
     "nodemailer": "^6.9.16",
     "pg-hstore": "^2.3.4",
     "winston": "^3.17.0",
-    "pg": "^8.11.0", // Replace with the latest version
-    "sequelize": "^6.31.0" // Replace with your version
+    "pg": "^8.11.0",
+    "sequelize": "^6.31.0" 
   },
   "devDependencies": {
     "nodemon": "^3.1.7",
