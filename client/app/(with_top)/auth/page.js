@@ -13,7 +13,6 @@ import {
 import axios from 'axios';
 import TopBar from '@/components/Topbar';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 
 const AuthFlow = () => {
   const router = useRouter();
@@ -420,7 +419,7 @@ const AuthFlow = () => {
                           onClick={handleGoogleSignIn}
                           className="flex items-center justify-center w-full text-gray-700 hover:text-gray-900"
                         >
-                          <Image
+                          <img
                             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                             alt="Google"
                             width={20}

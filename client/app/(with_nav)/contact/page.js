@@ -50,7 +50,7 @@ const Contact = () => {
         <div className="max-w-4xl mx-auto p-6 mt-20">
             <header className="text-center mb-6">
                 <h1 className="text-3xl font-bold text-black-600">Contact RideWise</h1>
-                <p className="text-gray-600">Have questions about driving with RideWise? We&apos;re here to give you answers.</p>
+                <p className="text-gray-600">Have questions about driving with RideWise? We're here to give you answers.</p>
             </header>
             
             <main>
@@ -60,7 +60,7 @@ const Contact = () => {
                     <ul className="list-disc ml-5 mt-4 text-gray-700">
                         <li><strong>Email:</strong> contactridewise@gmail.com</li>
                         <li><strong>Phone:</strong> +91 6003644157</li>
-                        <li><strong>Address:</strong> Kanchenjungha Men&apos;s Hostel, Tezpur University</li>
+                        <li><strong>Address:</strong> Kanchenjungha Men's Hostel, Tezpur University</li>
                     </ul>
                 </section>
 

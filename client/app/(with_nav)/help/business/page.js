@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-const Driving = () => {
+const driving = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const helpTopics = [
@@ -46,4 +46,4 @@ const Driving = () => {
   );
 };
 
-export default Driving;
+export default driving;

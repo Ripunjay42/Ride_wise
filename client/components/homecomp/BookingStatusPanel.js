@@ -17,7 +17,7 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
     if (isOpen && passengerId) {
       fetchBookings();
     }
-  }, [isOpen, passengerId, fetchBookings]);
+  }, [isOpen, passengerId]);
 
   const fetchBookings = async () => {
     try {

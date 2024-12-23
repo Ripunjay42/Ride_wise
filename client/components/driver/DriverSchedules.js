@@ -175,7 +175,7 @@ const DriverSchedules = ({ driverId }) => {
     if (showAllSchedules) {
       fetchSchedules();
     }
-  }, [showAllSchedules, driverId, fetchSchedules]);
+  }, [showAllSchedules, driverId]);
 
 
   useEffect(() => {
@@ -192,7 +192,7 @@ const DriverSchedules = ({ driverId }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  },  [isCancelModalOpen, showAllSchedules]);
+  },  [isCancelModalOpen]);
 
   if (!driverId) return null;
 
