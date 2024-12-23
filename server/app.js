@@ -15,6 +15,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors({
   origin: 'http://localhost:3000', // Adjust based on your frontend URL
+  origin: 'https://ride-wise-server.vercel.app/',
 }));
 
 // Routes
