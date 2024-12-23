@@ -7,15 +7,22 @@ const scheduleRoutes = require('./routes/scheduleRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 
-// Add this with your other route configurations
-
-
 const app = express();
 
 app.use(bodyParser.json());
+
+// Updated CORS configuration
+const allowedOrigins = ['http://localhost:3000', 'https://ride-wise-server.vercel.app/'];
 app.use(cors({
-  origin: 'http://localhost:3000', // Adjust based on your frontend URL
-  origin: 'https://ride-wise-server.vercel.app/',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 }));
 
 // Routes
@@ -23,7 +30,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api', scheduleRoutes);
 app.use(adminRoutes);
 app.use('/api/booking', bookingRoutes);
-
 
 // Sync database and start the server
 sequelize.authenticate().then(() => {
