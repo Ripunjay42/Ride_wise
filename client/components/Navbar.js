@@ -6,6 +6,7 @@ import { auth } from '@/components/firebase/firebaseconfig';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import Image from 'next/image';
 
 const Navbar = () => {
   const router = useRouter();
@@ -117,7 +118,7 @@ const Navbar = () => {
                   className="flex items-center space-x-2 text-white hover:text-gray-200 focus:outline-none"
                 >
                   {profilePic ? (
-                    <img
+                    <Image
                       src={profilePic}
                       alt="Profile"
                       className="h-8 w-8 rounded-full"

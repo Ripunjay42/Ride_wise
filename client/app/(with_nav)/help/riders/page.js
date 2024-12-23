@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-const riders = () => {
+const Riders = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const helpTopics = [
@@ -48,4 +48,4 @@ const riders = () => {
   );
 };
 
-export default riders;
+export default Riders;

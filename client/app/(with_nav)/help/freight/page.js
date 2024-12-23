@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-const freight = () => {
+const Freight = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const helpTopics = [
@@ -41,4 +41,4 @@ const freight = () => {
   );
 };
 
-export default freight;
+export default Freight;

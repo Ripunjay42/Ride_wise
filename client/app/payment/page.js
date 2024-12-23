@@ -53,7 +53,7 @@ const PaymentPage = () => {
     } else {
       setIsLoading(false);
     }
-  }, []);
+  },[bookingDetails, router]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {

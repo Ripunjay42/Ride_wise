@@ -57,7 +57,7 @@ const BookingApp = () => {
     if (mapContainer.current) {
       initializeMap();
     }
-  }, [mapContainer]);
+  }, [mapContainer, initializeMap]);
 
 
   
@@ -335,7 +335,7 @@ const BookingApp = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [resetComponent]);
 
   const searchLocation = async (query, isPickup = true) => {
     try {

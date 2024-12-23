@@ -68,18 +68,18 @@ const DriverScheduleApp = () => {
 
   useEffect(() => {
     fetchSuggestions(debouncedPickupSearch, true);
-  }, [debouncedPickupSearch]);
+  }, [debouncedPickupSearch,  fetchSuggestions]);
 
   useEffect(() => {
     fetchSuggestions(debouncedDropoffSearch, false);
-  }, [debouncedDropoffSearch]);
+  }, [debouncedDropoffSearch,  fetchSuggestions]);
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
     if (mapContainer.current) {
       initializeMap();
     }
-  }, [mapContainer]);
+  }, [mapContainer, initializeMap]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -114,7 +114,7 @@ const DriverScheduleApp = () => {
     });
   
     return () => unsubscribe();
-  }, []);
+  }, [resetComponent]);
 
   const clearRoute = () => {
     if (map) {
