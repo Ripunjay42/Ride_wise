@@ -18,13 +18,15 @@ const Navbar = () => {
   const [userName, setUserName] = useState('');
   const [profilePic, setProfilePic] = useState('');
 
+  const BASE_URL = 'https://ride-wise-server.vercel.app';
+
   // Listen to auth state changes and check registration status
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user?.email) {
         try {
           // Check if user exists in backend and is fully registered and is passenger
-          const response = await axios.get(`http://localhost:3001/api/auth/user/${user.email}`);
+          const response = await axios.get(`https://ride-wise-server.vercel.app/api/auth/user/${user.email}`);
           setIsRegistrationComplete(response.data.exists);
           console.log('Checking user registration:', response.data);
           if (response.data.exists) {

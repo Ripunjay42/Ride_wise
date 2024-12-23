@@ -50,7 +50,7 @@ const BookingApp = () => {
 
   const mapContainer = useRef(null);
 
-
+  const BASE_URL = 'https://ride-wise-server.vercel.app';
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
@@ -316,7 +316,7 @@ const BookingApp = () => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user?.email) {
         try {
-          const response = await axios.get(`http://localhost:3001/api/auth/user/${user.email}`);
+          const response = await axios.get(`https://ride-wise-server.vercel.app/api/auth/user/${user.email}`);
           setIsRegistrationComplete(response.data.userType === 'passenger');
           setIsLoggedIn(response.data.userType === 'passenger');
           if (response.data.userType === 'passenger') {
@@ -429,7 +429,7 @@ const BookingApp = () => {
     if (pickupLocation && dropoffLocation && selectedDate && selectedTime) {
       try {
         setIsLoading(true);
-        const response = await axios.post('http://localhost:3001/api/booking/check-availability', {
+        const response = await axios.post('https://ride-wise-server.vercel.app/api/booking/check-availability', {
           pickupLocation,
           dropoffLocation,
           date: selectedDate,

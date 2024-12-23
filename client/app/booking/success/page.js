@@ -14,11 +14,13 @@ const SuccessPage = () => {
   const [error, setError] = useState(null);
   const pnr = searchParams.get('pnr');
 
+  const BASE_URL = 'https://ride-wise-server.vercel.app';
+
   useEffect(() => {
     const fetchBookingDetails = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`http://localhost:3001/api/booking/pnr/${pnr}`);
+        const response = await axios.get(`https://ride-wise-server.vercel.app/api/booking/pnr/${pnr}`);
         setBookingDetails(response.data.booking);
       } catch (error) {
         console.error('Error fetching booking details:', error);

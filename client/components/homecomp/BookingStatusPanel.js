@@ -12,7 +12,7 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const [selectedBookingForRating, setSelectedBookingForRating] = useState(null);
-
+  const BASE_URL = 'https://ride-wise-server.vercel.app';
   useEffect(() => {
     if (isOpen && passengerId) {
       fetchBookings();
@@ -24,7 +24,7 @@ const BookingStatusPanel = ({ isOpen, onClose, passengerId }) => {
         console.log('Fetching bookings for passenger:', passengerId);
       setIsLoading(true);
       setError('');
-      const response = await axios.get(`http://localhost:3001/api/booking/passenger/${passengerId}`);
+      const response = await axios.get(`${BASE_URL}/api/booking/passenger/${passengerId}`);
       console.log(response.data);
       if (response.data.success) {
         setBookings(response.data.bookings);

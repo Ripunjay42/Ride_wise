@@ -17,6 +17,8 @@ const AdminPanel = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const BASE_URL = 'https://ride-wise-server.vercel.app';
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
@@ -28,7 +30,7 @@ const AdminPanel = () => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:3001/api/auth/admin/login', formData);
+      const response = await axios.post('https://ride-wise-server.vercel.app/api/auth/admin/login', formData);
       if (response.data.success) {
         setIsLoggedIn(true);
         setAdminName(response.data.admin.admin_name);

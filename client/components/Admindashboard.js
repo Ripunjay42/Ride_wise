@@ -161,13 +161,15 @@ const Admindashboard = ({ adminName, onLogout }) => {
   const [passengers, setPassengers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const BASE_URL = 'https://ride-wise-server.vercel.app';
+
   // Fetch drivers and passengers data
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [driversRes, passengersRes] = await Promise.all([
-          axios.get('http://localhost:3001/api/drivers'),
-          axios.get('http://localhost:3001/api/passengers')
+          axios.get('https://ride-wise-server.vercel.app/api/drivers'),
+          axios.get('https://ride-wise-server.vercel.app/api/passengers')
         ]);
         setDrivers(driversRes.data);
         setPassengers(passengersRes.data);
@@ -183,7 +185,7 @@ const Admindashboard = ({ adminName, onLogout }) => {
     if (window.confirm('Are you sure you want to verify this driver?')) {
       setIsLoading(true);
       try {
-        await axios.patch(`http://localhost:3001/api/drivers/${driverId}/verify`, {
+        await axios.patch(`https://ride-wise-server.vercel.app/api/drivers/${driverId}/verify`, {
           status: 'active'
         });
         

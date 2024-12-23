@@ -14,12 +14,13 @@ const TopBar = () => {
   const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userType, setUserType] = useState('');
+  const BASE_URL = 'https://ride-wise-server.vercel.app';
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user?.email) {
         try {
-          const response = await axios.get(`http://localhost:3001/api/auth/user/${user.email}`);
+          const response = await axios.get(`https://ride-wise-server.vercel.app/api/auth/user/${user.email}`);
           setIsRegistrationComplete(response.data.userType === 'driver');
           if (response.data.userType === 'driver') {
             setIsLoggedIn(true);

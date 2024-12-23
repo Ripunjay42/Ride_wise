@@ -24,6 +24,8 @@ const DriverSchedules = ({ driverId }) => {
 
   const scheduleRef = useRef(null);
 
+  const BASE_URL = 'https://ride-wise-server.vercel.app';
+
   const statusOptions = [
     { value: 'all', label: 'All Schedules' },
     { value: 'active', label: 'Active' },
@@ -51,7 +53,7 @@ const DriverSchedules = ({ driverId }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`http://localhost:3001/api/schedules/driver/${driverId}`);
+      const response = await axios.get(`https://ride-wise-server.vercel.app/api/schedules/driver/${driverId}`);
       setSchedules(response.data);
       setFilteredSchedules(response.data);
     } catch (err) {
@@ -65,7 +67,7 @@ const DriverSchedules = ({ driverId }) => {
   const fetchPnrDetails = async (scheduleId) => {
     console.log('Fetching PNR details:', scheduleId);
     try {
-      const response = await axios.get(`http://localhost:3001/api/pnr/schedule/${scheduleId}`);
+      const response = await axios.get(`https://ride-wise-server.vercel.app/api/pnr/schedule/${scheduleId}`);
       setCurrentPnrDetails(response.data.booking);
     } catch (err) {
       console.error('Error fetching PNR details:', err);
@@ -76,7 +78,7 @@ const DriverSchedules = ({ driverId }) => {
     console.log('Completing ride:', scheduleId);
     try {
       await fetchPnrDetails(scheduleId);
-      const response = await axios.post(`http://localhost:3001/api/schedules/${scheduleId}/send-otp`);
+      const response = await axios.post(`https://ride-wise-server.vercel.app/api/schedules/${scheduleId}/send-otp`);
       console.log('OTP sent:', response.data);
       if (response.data.success) {
         setSelectedScheduleId(scheduleId);
@@ -95,7 +97,7 @@ const DriverSchedules = ({ driverId }) => {
       setOtpVerificationLoading(true);
       setOtpError('');
 
-      const response = await axios.post(`http://localhost:3001/api/schedules/${selectedScheduleId}/verify-otp`, {
+      const response = await axios.post(`https://ride-wise-server.vercel.app/api/schedules/${selectedScheduleId}/verify-otp`, {
         otp,
         pnrId: currentPnrDetails.pnr
       });
@@ -133,7 +135,7 @@ const DriverSchedules = ({ driverId }) => {
         )
       );
 
-      await axios.put(`http://localhost:3001/api/schedules/${selectedScheduleId}/cancel`);
+      await axios.put(`https://ride-wise-server.vercel.app/api/schedules/${selectedScheduleId}/cancel`);
       setIsCancelModalOpen(false);
       setSelectedScheduleId(null);
     } catch (err) {
