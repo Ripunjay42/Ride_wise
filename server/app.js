@@ -12,7 +12,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Updated CORS configuration
-const allowedOrigins = ['http://localhost:3000', 'https://ride-wise-bay.vercel.app/'];
+const allowedOrigins = ['http://localhost:3000', 'https://ride-wise-bay.vercel.app'];
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
