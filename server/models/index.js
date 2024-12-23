@@ -1,3 +1,4 @@
+// models/index.js
 'use strict';
 
 const fs = require('fs');
@@ -9,32 +10,42 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/database.js')[env];
 const db = {};
 
+// Load pg module
+let pg;
+try {
+  pg = require('pg');
+} catch (error) {
+  console.error('Error loading pg module:', error);
+  throw error;
+}
+
 let sequelize;
 
 try {
-  // Debugging configurations
-  console.log('Environment:', env);
-  console.log('Database Config:', config);
-
-  // Initialize Sequelize
+  // Initialize Sequelize with pg module
   if (config.use_env_variable) {
-    sequelize = new Sequelize(process.env[config.use_env_variable], config);
+    sequelize = new Sequelize(process.env[config.use_env_variable], {
+      ...config,
+      dialectModule: pg
+    });
   } else {
     sequelize = new Sequelize(
       config.database,
       config.username,
       config.password,
-      config
+      {
+        ...config,
+        dialectModule: pg
+      }
     );
   }
-  console.log('Sequelize successfully initialized.');
 } catch (error) {
   console.error('Sequelize initialization error:', error);
-  throw error; // Exit with error if Sequelize fails to initialize
+  throw error;
 }
 
 try {
-  // Dynamically load models
+  // Load models
   fs.readdirSync(__dirname)
     .filter(file => {
       return (
@@ -60,7 +71,6 @@ try {
       db[modelName].associate(db);
     }
   });
-  console.log('Models successfully loaded.');
 } catch (error) {
   console.error('Error during model loading or association:', error);
   throw error;
